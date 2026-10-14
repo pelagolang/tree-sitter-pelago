@@ -1,0 +1,11 @@
+node_modules/
+build/
+target/
+*.so
+*.dylib
+*.dll
+*.wasm
+*.o
+log.html
+# src/parser.c, src/grammar.json, src/node-types.json and src/tree_sitter/ are generated but
+# committed on purpose: editors build the grammar from the repository without running the generator.

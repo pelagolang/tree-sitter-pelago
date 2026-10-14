@@ -1,0 +1,23 @@
+{
+  "$schema": "https://tree-sitter.github.io/tree-sitter/assets/schemas/config.schema.json",
+  "grammars": [
+    {
+      "name": "pelago",
+      "camelcase": "Pelago",
+      "title": "Pelago",
+      "scope": "source.pelago",
+      "file-types": ["pel"],
+      "injection-regex": "^pelago$",
+      "highlights": ["queries/highlights.scm"],
+      "path": "."
+    }
+  ],
+  "metadata": {
+    "version": "0.1.0",
+    "license": "UNLICENSED",
+    "description": "Tree-sitter grammar for Pelago (.pel)",
+    "links": {
+      "repository": "https://github.com/pelagolang/tree-sitter-pelago"
+    }
+  }
+}

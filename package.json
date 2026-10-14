@@ -1,0 +1,15 @@
+{
+  "name": "tree-sitter-pelago",
+  "version": "0.1.0",
+  "description": "Tree-sitter grammar for Pelago (.pel)",
+  "main": "bindings/node",
+  "keywords": ["parser", "tree-sitter", "pelago"],
+  "files": ["grammar.js", "tree-sitter.json", "src/**", "queries/**"],
+  "scripts": {
+    "generate": "tree-sitter generate",
+    "test": "tree-sitter test"
+  },
+  "devDependencies": {
+    "tree-sitter-cli": "0.27.1"
+  }
+}
