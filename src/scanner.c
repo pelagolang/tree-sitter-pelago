@@ -33,6 +33,13 @@ enum TokenType {
   INIT_KW,
   DEFAULT_SWITCH,
   DEFAULT_SELECT,
+  BUILDER_LBRACKET,
+  BUILDER_LPAREN,
+  BUILDER_LBRACE,
+  CLOSURE_LPAREN,
+  CLOSURE_LBRACKET,
+  BLOCK_LBRACE,
+  STRUCT_LBRACE,
   BLOCK_COMMENT,
   DOC_BLOCK_COMMENT,
 };
@@ -149,6 +156,247 @@ static bool skip_comment_after_slash(TSLexer *l) {
     }
     while (!l->eof(l) && l->lookahead != '\n') adv(l);
     return true;
+  }
+  return false;
+}
+
+
+// ---- Look-ahead over bracketed groups (closures and builders) --------------------------------------
+
+#define GROUP_BUDGET 200000
+
+static bool skip_group(TSLexer *l, int32_t close, bool *has_of, unsigned *budget);
+
+// After the opening `"` of a string: consumes up to and including the closing `"`.
+static void skip_string(TSLexer *l, unsigned *budget) {
+  while (!l->eof(l) && *budget > 0) {
+    int32_t c = l->lookahead;
+    (*budget)--;
+    if (c == '\\') {
+      adv(l);
+      if (!l->eof(l)) adv(l);
+    } else if (c == '"') {
+      adv(l);
+      return;
+    } else if (c == '#') {
+      adv(l);
+      if (l->lookahead == '(') {
+        adv(l);
+        skip_group(l, ')', NULL, budget);
+      }
+    } else {
+      adv(l);
+    }
+  }
+}
+
+// After the opening `'` of a character literal.
+static void skip_char(TSLexer *l, unsigned *budget) {
+  while (!l->eof(l) && *budget > 0 && l->lookahead != '\n') {
+    int32_t c = l->lookahead;
+    (*budget)--;
+    adv(l);
+    if (c == '\\') {
+      if (!l->eof(l)) adv(l);
+    } else if (c == '\'') {
+      return;
+    }
+  }
+}
+
+// The opening bracket was consumed. Consumes up to and including the matching `close`.
+// Sets `*has_of` when the word `of` stands directly inside this group (a builder).
+// Returns false when the group is not closed properly.
+static bool skip_group(TSLexer *l, int32_t close, bool *has_of, unsigned *budget) {
+  int32_t stack[96];
+  unsigned sp = 0;
+  stack[sp++] = close;
+  while (!l->eof(l) && *budget > 0) {
+    int32_t c = l->lookahead;
+    (*budget)--;
+    switch (c) {
+      case '(':
+      case '[':
+      case '{':
+        if (sp >= sizeof(stack) / sizeof(stack[0])) return false;
+        stack[sp++] = c == '(' ? ')' : c == '[' ? ']' : '}';
+        adv(l);
+        break;
+      case ')':
+      case ']':
+      case '}':
+        if (c != stack[sp - 1]) return false;
+        adv(l);
+        if (--sp == 0) return true;
+        break;
+      case '"':
+        adv(l);
+        skip_string(l, budget);
+        break;
+      case '\'':
+        adv(l);
+        skip_char(l, budget);
+        break;
+      case '/':
+        adv(l);
+        if (l->lookahead == '*') {
+          adv(l);
+          finish_block_comment(l);
+        } else if (l->lookahead == '/') {
+          while (!l->eof(l) && l->lookahead != '\n') adv(l);
+        }
+        break;
+      default:
+        if (is_ident_char(c)) {
+          char buf[WORD_MAX];
+          unsigned len;
+          read_word(l, buf, &len);
+          if (sp == 1 && has_of != NULL && word_is(buf, len, "of")) *has_of = true;
+        } else {
+          adv(l);
+        }
+    }
+  }
+  return false;
+}
+
+// After `)`: is a `~>` next, or `-> Type ~>`? Blanks are skipped, newlines are not.
+static bool closure_tail(TSLexer *l, unsigned *budget) {
+  skip_blanks(l);
+  if (l->lookahead == '~') {
+    adv(l);
+    return l->lookahead == '>';
+  }
+  if (l->lookahead != '-') return false;
+  adv(l);
+  if (l->lookahead != '>') return false;
+  adv(l);
+  unsigned angle = 0;
+  for (unsigned steps = 0; steps < 256 && !l->eof(l); steps++) {
+    int32_t c = l->lookahead;
+    switch (c) {
+      case '~':
+        adv(l);
+        return l->lookahead == '>';
+      case '<':
+        angle++;
+        adv(l);
+        break;
+      case '>':
+        if (angle > 0) angle--;
+        adv(l);
+        break;
+      case ',':
+        if (angle == 0) return false;
+        adv(l);
+        break;
+      case '\n':
+      case '{':
+      case '}':
+      case ')':
+      case ']':
+      case ';':
+      case '=':
+        return false;
+      case '(':
+        adv(l);
+        if (!skip_group(l, ')', NULL, budget)) return false;
+        break;
+      case '[':
+        adv(l);
+        if (!skip_group(l, ']', NULL, budget)) return false;
+        break;
+      default:
+        adv(l);
+    }
+  }
+  return false;
+}
+
+// After `]`: closure parameters and `~>`: `~>`, `x ~>`, or `(params) ~>`.
+static bool capture_tail(TSLexer *l, unsigned *budget) {
+  skip_blanks(l);
+  int32_t c = l->lookahead;
+  if (c == '~') return closure_tail(l, budget);
+  if (is_ident_start(c)) {
+    char buf[WORD_MAX];
+    unsigned len;
+    read_word(l, buf, &len);
+    skip_blanks(l);
+    if (l->lookahead != '~') return false;
+    adv(l);
+    return l->lookahead == '>';
+  }
+  if (c == '(') {
+    adv(l);
+    if (!skip_group(l, ')', NULL, budget)) return false;
+    return closure_tail(l, budget);
+  }
+  return false;
+}
+
+// The lookahead is `(`, `[` or `{` (blanks already skipped). Decides which of the bracket tokens it is.
+static bool scan_open_bracket(TSLexer *l, const bool *valid) {
+  int32_t c = l->lookahead;
+  unsigned budget = GROUP_BUDGET;
+  bool has_of = false;
+  if (c == '(') {
+    bool want_closure = valid[CLOSURE_LPAREN];
+    bool want_builder = valid[BUILDER_LPAREN];
+    if (!want_closure && !want_builder) return false;
+    adv(l);
+    l->mark_end(l);
+    if (!skip_group(l, ')', &has_of, &budget)) return false;
+    if (want_builder && has_of) {
+      l->result_symbol = BUILDER_LPAREN;
+      return true;
+    }
+    if (want_closure && closure_tail(l, &budget)) {
+      l->result_symbol = CLOSURE_LPAREN;
+      return true;
+    }
+    return false;
+  }
+  if (c == '[') {
+    bool want_closure = valid[CLOSURE_LBRACKET];
+    bool want_builder = valid[BUILDER_LBRACKET];
+    if (!want_closure && !want_builder) return false;
+    adv(l);
+    l->mark_end(l);
+    if (!skip_group(l, ']', &has_of, &budget)) return false;
+    if (want_closure && capture_tail(l, &budget)) {
+      l->result_symbol = CLOSURE_LBRACKET;
+      return true;
+    }
+    if (want_builder && has_of) {
+      l->result_symbol = BUILDER_LBRACKET;
+      return true;
+    }
+    return false;
+  }
+  if (c == '{') {
+    if (valid[BUILDER_LBRACE]) {
+      adv(l);
+      l->mark_end(l);
+      if (!skip_group(l, '}', &has_of, &budget) || !has_of) return false;
+      l->result_symbol = BUILDER_LBRACE;
+      return true;
+    }
+    // A `{` after a condition is a block; after anything else that can end a name it may be a
+    // struct literal. When both are possible the block wins (struct literals are not allowed
+    // in conditions).
+    if (valid[BLOCK_LBRACE]) {
+      adv(l);
+      l->mark_end(l);
+      l->result_symbol = BLOCK_LBRACE;
+      return true;
+    }
+    if (valid[STRUCT_LBRACE]) {
+      adv(l);
+      l->mark_end(l);
+      l->result_symbol = STRUCT_LBRACE;
+      return true;
+    }
   }
   return false;
 }
@@ -390,6 +638,8 @@ bool tree_sitter_pelago_external_scanner_scan(void *payload, TSLexer *l, const b
     while (is_blank(l->lookahead) || l->lookahead == '\n') skip(l);
     c = l->lookahead;
   }
+
+  if (c == '(' || c == '[' || c == '{') return scan_open_bracket(l, valid);
 
   if (c == '/') {
     adv(l);
