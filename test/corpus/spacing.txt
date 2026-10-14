@@ -1,0 +1,205 @@
+========================================
+a question mark that touches is error propagation
+========================================
+
+f()?
+a.b()? + 1
+f()? ? a : b
+a ? b : c
+
+---
+
+(source_file
+  (try_expression
+    (call_expression
+      (identifier)
+      (argument_list)))
+  (binary_expression
+    (try_expression
+      (call_expression
+        (field_expression
+          (identifier)
+          (identifier))
+        (argument_list)))
+    (integer_literal))
+  (ternary_expression
+    (try_expression
+      (call_expression
+        (identifier)
+        (argument_list)))
+    (identifier)
+    (identifier))
+  (ternary_expression
+    (identifier)
+    (identifier)
+    (identifier)))
+
+========================================
+a less-than that touches a name opens generic arguments
+========================================
+
+max<int>(3, 7)
+a < b
+a<b
+if a<b { }
+const x = f<list<int>>(y)
+const s = stack<int> { items: [] }
+
+---
+
+(source_file
+  (call_expression
+    (type_application
+      (identifier)
+      (type_arguments
+        (type_identifier)))
+    (argument_list
+      (argument
+        (integer_literal))
+      (argument
+        (integer_literal))))
+  (binary_expression
+    (identifier)
+    (identifier))
+  (binary_expression
+    (identifier)
+    (identifier))
+  (if_expression
+    (binary_expression
+      (identifier)
+      (identifier))
+    (block))
+  (variable_declaration
+    (identifier)
+    (call_expression
+      (type_application
+        (identifier)
+        (type_arguments
+          (generic_type
+            (type_identifier)
+            (type_arguments
+              (type_identifier)))))
+      (argument_list
+        (argument
+          (identifier)))))
+  (variable_declaration
+    (identifier)
+    (struct_expression
+      (type_application
+        (identifier)
+        (type_arguments
+          (type_identifier)))
+      (struct_literal_body
+        (field_initializer
+          (identifier)
+          (list_expression))))))
+
+========================================
+a bracket that touches is indexing
+========================================
+
+xs[0]
+return [0]
+grid[i][j]
+[1, 2][0]
+
+---
+
+(source_file
+  (index_expression
+    (identifier)
+    (integer_literal))
+  (return_expression
+    (list_expression
+      (integer_literal)))
+  (index_expression
+    (index_expression
+      (identifier)
+      (identifier))
+    (identifier))
+  (index_expression
+    (list_expression
+      (integer_literal)
+      (integer_literal))
+    (integer_literal)))
+
+========================================
+a bang that touches a name before a parenthesis marks a call
+========================================
+
+c.bump!()
+c.close!!()
+a != b
+task.join!!()
+
+---
+
+(source_file
+  (call_expression
+    (field_expression
+      (identifier)
+      (identifier))
+    (call_mark)
+    (argument_list))
+  (call_expression
+    (field_expression
+      (identifier)
+      (identifier))
+    (call_mark)
+    (argument_list))
+  (binary_expression
+    (identifier)
+    (identifier))
+  (call_expression
+    (field_expression
+      (identifier)
+      (identifier))
+    (call_mark)
+    (argument_list)))
+
+========================================
+to? needs the question mark to touch
+========================================
+
+pet to? dog
+x to int ? a : b
+
+---
+
+(source_file
+  (convert_expression
+    (identifier)
+    (type_identifier))
+  (ternary_expression
+    (convert_expression
+      (identifier)
+      (type_identifier))
+    (identifier)
+    (identifier)))
+
+========================================
+a type's question mark must touch the type
+========================================
+
+var cache: int? = none
+fn find(xs: [string]) -> int? { none }
+
+---
+
+(source_file
+  (variable_declaration
+    (identifier)
+    (option_type
+      (type_identifier))
+    (none))
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (list_type
+          (type_identifier))))
+    (option_type
+      (type_identifier))
+    (block
+      (none))))

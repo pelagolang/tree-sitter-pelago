@@ -1,0 +1,191 @@
+========================================
+arguments, labels, modes and spreads
+========================================
+
+greet("Dennis", greeting: "Hi")
+clear(inout scores)
+finish(sink scores)
+sum(...[1, 2, 3])
+f(a: 1, ...b, inout c)
+
+---
+
+(source_file
+  (call_expression
+    (identifier)
+    (argument_list
+      (argument
+        (string_literal
+          (string_content)))
+      (argument
+        (identifier)
+        (string_literal
+          (string_content)))))
+  (call_expression
+    (identifier)
+    (argument_list
+      (argument
+        (mode)
+        (identifier))))
+  (call_expression
+    (identifier)
+    (argument_list
+      (argument
+        (mode)
+        (identifier))))
+  (call_expression
+    (identifier)
+    (argument_list
+      (argument
+        (list_expression
+          (integer_literal)
+          (integer_literal)
+          (integer_literal)))))
+  (call_expression
+    (identifier)
+    (argument_list
+      (argument
+        (identifier)
+        (integer_literal))
+      (argument
+        (identifier))
+      (argument
+        (mode)
+        (identifier)))))
+
+========================================
+generic calls and struct literals
+========================================
+
+const widest = max<int>(3, 7)
+const pair = (tx, rx) = chan<int>()
+const s = point { x: 3.0, y: 4.0 }
+const t = Self { }
+const u = shape.circle { radius: 1.0 }
+
+---
+
+(source_file
+  (variable_declaration
+    (identifier)
+    (call_expression
+      (type_application
+        (identifier)
+        (type_arguments
+          (type_identifier)))
+      (argument_list
+        (argument
+          (integer_literal))
+        (argument
+          (integer_literal)))))
+  (variable_declaration
+    (identifier)
+    (assignment_expression
+      (tuple_expression
+        (identifier)
+        (identifier))
+      (call_expression
+        (type_application
+          (identifier)
+          (type_arguments
+            (type_identifier)))
+        (argument_list))))
+  (variable_declaration
+    (identifier)
+    (struct_expression
+      (identifier)
+      (struct_literal_body
+        (field_initializer
+          (identifier)
+          (float_literal))
+        (field_initializer
+          (identifier)
+          (float_literal)))))
+  (variable_declaration
+    (identifier)
+    (struct_expression
+      (self_type)
+      (struct_literal_body)))
+  (variable_declaration
+    (identifier)
+    (struct_expression
+      (field_expression
+        (identifier)
+        (identifier))
+      (struct_literal_body
+        (field_initializer
+          (identifier)
+          (float_literal))))))
+
+========================================
+struct literals are not allowed in conditions
+========================================
+
+if x { y }
+while ready { work() }
+for x of xs { x }
+if (point { x: 1 }) == p { y }
+switch s { case 1: 2 }
+
+---
+
+(source_file
+  (if_expression
+    (identifier)
+    (block
+      (identifier)))
+  (while_expression
+    (identifier)
+    (block
+      (call_expression
+        (identifier)
+        (argument_list))))
+  (for_expression
+    (identifier)
+    (identifier)
+    (block
+      (identifier)))
+  (if_expression
+    (binary_expression
+      (parenthesized_expression
+        (struct_expression
+          (identifier)
+          (struct_literal_body
+            (field_initializer
+              (identifier)
+              (integer_literal)))))
+      (identifier))
+    (block
+      (identifier)))
+  (switch_expression
+    (identifier)
+    (switch_body
+      (switch_arm
+        (integer_literal)
+        (integer_literal)))))
+
+========================================
+struct literal fields
+========================================
+
+const cfg = config {
+    port: 9090,
+    verbose,
+    ...defaults,
+}
+
+---
+
+(source_file
+  (variable_declaration
+    (identifier)
+    (struct_expression
+      (identifier)
+      (struct_literal_body
+        (field_initializer
+          (identifier)
+          (integer_literal))
+        (field_initializer
+          (identifier))
+        (spread_element
+          (identifier))))))

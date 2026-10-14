@@ -1,0 +1,255 @@
+========================================
+a newline ends a statement
+========================================
+
+a = 1
+b = 2
+c
+(d)
+[1, 2].len()
+
+---
+
+(source_file
+  (assignment_expression
+    (identifier)
+    (integer_literal))
+  (assignment_expression
+    (identifier)
+    (integer_literal))
+  (identifier)
+  (parenthesized_expression
+    (identifier))
+  (call_expression
+    (field_expression
+      (list_expression
+        (integer_literal)
+        (integer_literal))
+      (identifier))
+    (argument_list)))
+
+========================================
+continued by a leading dot or operator
+========================================
+
+const chain = items
+    .filter(~> it > 0)
+    .map(~> it * 2)
+    .to_list()
+const piped = raw
+    |> trim
+    |> parse
+const both = a
+    && b
+    || c
+const alt = a
+    ?? b
+const maybe = user
+    ?.name
+
+---
+
+(source_file
+  (variable_declaration
+    (identifier)
+    (call_expression
+      (field_expression
+        (call_expression
+          (field_expression
+            (call_expression
+              (field_expression
+                (identifier)
+                (identifier))
+              (argument_list
+                (argument
+                  (closure_expression
+                    (binary_expression
+                      (identifier)
+                      (integer_literal))))))
+            (identifier))
+          (argument_list
+            (argument
+              (closure_expression
+                (binary_expression
+                  (identifier)
+                  (integer_literal))))))
+        (identifier))
+      (argument_list)))
+  (variable_declaration
+    (identifier)
+    (binary_expression
+      (binary_expression
+        (identifier)
+        (identifier))
+      (identifier)))
+  (variable_declaration
+    (identifier)
+    (binary_expression
+      (binary_expression
+        (identifier)
+        (identifier))
+      (identifier)))
+  (variable_declaration
+    (identifier)
+    (binary_expression
+      (identifier)
+      (identifier)))
+  (variable_declaration
+    (identifier)
+    (field_expression
+      (identifier)
+      (identifier))))
+
+========================================
+continued after an operator or a comma
+========================================
+
+const q = 1 +
+  2
+const xs = [
+    1,
+    2,
+]
+f(a,
+  b)
+
+---
+
+(source_file
+  (variable_declaration
+    (identifier)
+    (binary_expression
+      (integer_literal)
+      (integer_literal)))
+  (variable_declaration
+    (identifier)
+    (list_expression
+      (integer_literal)
+      (integer_literal)))
+  (call_expression
+    (identifier)
+    (argument_list
+      (argument
+        (identifier))
+      (argument
+        (identifier)))))
+
+========================================
+ternary written over several lines
+========================================
+
+const verdict = score > 90
+    ? "A"
+    : score > 80
+        ? "B"
+        : "C"
+
+---
+
+(source_file
+  (variable_declaration
+    (identifier)
+    (ternary_expression
+      (binary_expression
+        (identifier)
+        (integer_literal))
+      (string_literal
+        (string_content))
+      (ternary_expression
+        (binary_expression
+          (identifier)
+          (integer_literal))
+        (string_literal
+          (string_content))
+        (string_literal
+          (string_content))))))
+
+========================================
+else on the next line
+========================================
+
+if a { 1 }
+else { 2 }
+if a { 1 }
+// comment between
+else if b { 2 }
+else { 3 }
+
+---
+
+(source_file
+  (if_expression
+    (identifier)
+    (block
+      (integer_literal))
+    (else_clause
+      (block
+        (integer_literal))))
+  (if_expression
+    (identifier)
+    (block
+      (integer_literal))
+    (line_comment)
+    (else_clause
+      (if_expression
+        (identifier)
+        (block
+          (integer_literal))
+        (else_clause
+          (block
+            (integer_literal)))))))
+
+========================================
+semicolons
+========================================
+
+a = 1; b = 2
+{ x; y }
+
+---
+
+(source_file
+  (assignment_expression
+    (identifier)
+    (integer_literal))
+  (assignment_expression
+    (identifier)
+    (integer_literal))
+  (block
+    (identifier)
+    (identifier)))
+
+========================================
+comments between statements
+========================================
+
+a = 1 // one
+// two
+b = 2 /* three */
+
+---
+
+(source_file
+  (assignment_expression
+    (identifier)
+    (integer_literal))
+  (line_comment)
+  (line_comment)
+  (assignment_expression
+    (identifier)
+    (integer_literal))
+  (block_comment))
+
+========================================
+a line starting with .. is not a continuation
+========================================
+
+a
+..b
+
+---
+
+(source_file
+  (identifier)
+  (range_expression
+    (identifier)))

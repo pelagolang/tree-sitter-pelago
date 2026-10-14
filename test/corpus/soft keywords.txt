@@ -1,0 +1,257 @@
+========================================
+soft keywords are ordinary names
+========================================
+
+var from = base
+var to = tmp
+to = from
+const type = 1
+type = 2
+open(file)
+static(x)
+final = 3
+init(x)
+default = 1
+test("x")
+step(1)
+it + 1
+map(xs)
+set(x)
+select(a)
+soa(1)
+scope(a)
+any(xs)
+xs.any(f)
+xs.type
+const m = map
+fn f(to: int, from: str) { }
+fn map<U>(self, f: fn(T) -> U) -> iter<U> { }
+fn set(inout self, sink value: T) { }
+impl<K, V> map<K, V> { }
+var out: set<T> = set {}
+
+---
+
+(source_file
+  (variable_declaration
+    (identifier)
+    (identifier))
+  (variable_declaration
+    (identifier)
+    (identifier))
+  (assignment_expression
+    (identifier)
+    (identifier))
+  (variable_declaration
+    (identifier)
+    (integer_literal))
+  (assignment_expression
+    (identifier)
+    (integer_literal))
+  (call_expression
+    (identifier)
+    (argument_list
+      (argument
+        (identifier))))
+  (call_expression
+    (identifier)
+    (argument_list
+      (argument
+        (identifier))))
+  (assignment_expression
+    (identifier)
+    (integer_literal))
+  (call_expression
+    (identifier)
+    (argument_list
+      (argument
+        (identifier))))
+  (assignment_expression
+    (identifier)
+    (integer_literal))
+  (call_expression
+    (identifier)
+    (argument_list
+      (argument
+        (string_literal
+          (string_content)))))
+  (call_expression
+    (identifier)
+    (argument_list
+      (argument
+        (integer_literal))))
+  (binary_expression
+    (identifier)
+    (integer_literal))
+  (call_expression
+    (identifier)
+    (argument_list
+      (argument
+        (identifier))))
+  (call_expression
+    (identifier)
+    (argument_list
+      (argument
+        (identifier))))
+  (call_expression
+    (identifier)
+    (argument_list
+      (argument
+        (identifier))))
+  (call_expression
+    (identifier)
+    (argument_list
+      (argument
+        (integer_literal))))
+  (call_expression
+    (identifier)
+    (argument_list
+      (argument
+        (identifier))))
+  (call_expression
+    (identifier)
+    (argument_list
+      (argument
+        (identifier))))
+  (call_expression
+    (field_expression
+      (identifier)
+      (identifier))
+    (argument_list
+      (argument
+        (identifier))))
+  (field_expression
+    (identifier)
+    (identifier))
+  (variable_declaration
+    (identifier)
+    (identifier))
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (type_identifier))
+      (parameter
+        (identifier)
+        (type_identifier)))
+    (block))
+  (function_declaration
+    (identifier)
+    (generic_parameters
+      (generic_parameter
+        (type_identifier)))
+    (parameter_list
+      (parameter
+        (self))
+      (parameter
+        (identifier)
+        (function_type
+          (type_identifier)
+          (type_identifier))))
+    (generic_type
+      (type_identifier)
+      (type_arguments
+        (type_identifier)))
+    (block))
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (mode)
+        (self))
+      (parameter
+        (mode)
+        (identifier)
+        (type_identifier)))
+    (block))
+  (impl_declaration
+    (generic_parameters
+      (generic_parameter
+        (type_identifier))
+      (generic_parameter
+        (type_identifier)))
+    (generic_type
+      (type_identifier)
+      (type_arguments
+        (type_identifier)
+        (type_identifier)))
+    (declaration_list))
+  (variable_declaration
+    (identifier)
+    (generic_type
+      (type_identifier)
+      (type_arguments
+        (type_identifier)))
+    (set_expression)))
+
+========================================
+soft keywords still act as keywords where they apply
+========================================
+
+const d = x to float
+for i in 0..n step 2 { }
+type id = int64
+type pair<A, B> = (A, B)
+test "name" { }
+open fn speak(self) { }
+fn f<T>() where T: show { }
+const t = select { default { } }
+
+---
+
+(source_file
+  (variable_declaration
+    (identifier)
+    (convert_expression
+      (identifier)
+      (type_identifier)))
+  (for_expression
+    (identifier)
+    (range_expression
+      (range_expression
+        (integer_literal)
+        (identifier))
+      (integer_literal))
+    (block))
+  (type_alias
+    (type_identifier)
+    (type_identifier))
+  (type_alias
+    (type_identifier)
+    (generic_parameters
+      (generic_parameter
+        (type_identifier))
+      (generic_parameter
+        (type_identifier)))
+    (tuple_type
+      (type_identifier)
+      (type_identifier)))
+  (test_declaration
+    (string_literal
+      (string_content))
+    (block))
+  (function_declaration
+    (modifiers
+      (modifier))
+    (identifier)
+    (parameter_list
+      (parameter
+        (self)))
+    (block))
+  (function_declaration
+    (identifier)
+    (generic_parameters
+      (generic_parameter
+        (type_identifier)))
+    (parameter_list)
+    (where_clause
+      (where_predicate
+        (type_identifier)
+        (type_identifier)))
+    (block))
+  (variable_declaration
+    (identifier)
+    (select_expression
+      (select_arm
+        (block)))))

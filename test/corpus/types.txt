@@ -1,0 +1,189 @@
+========================================
+type forms
+========================================
+
+var a: int
+var b: [int]
+var c: [int; 256]
+var d: (int, string)
+var e: (int, string; 4)
+var f: int?
+var g: int ! parse_error
+var h: map<string, [int]>
+var i: fn(int) -> int
+var j: any shape_like
+var k: Self
+var l: soa<point, 8>
+var m: std.io.file
+var n: list<list<int>>
+var o: fn(inout int, string)
+
+---
+
+(source_file
+  (variable_declaration
+    (identifier)
+    (type_identifier))
+  (variable_declaration
+    (identifier)
+    (list_type
+      (type_identifier)))
+  (variable_declaration
+    (identifier)
+    (array_type
+      (type_identifier)
+      (integer_literal)))
+  (variable_declaration
+    (identifier)
+    (tuple_type
+      (type_identifier)
+      (type_identifier)))
+  (variable_declaration
+    (identifier)
+    (tuple_type
+      (type_identifier)
+      (type_identifier)
+      (integer_literal)))
+  (variable_declaration
+    (identifier)
+    (option_type
+      (type_identifier)))
+  (variable_declaration
+    (identifier)
+    (result_type
+      (type_identifier)
+      (type_identifier)))
+  (variable_declaration
+    (identifier)
+    (generic_type
+      (type_identifier)
+      (type_arguments
+        (type_identifier)
+        (list_type
+          (type_identifier)))))
+  (variable_declaration
+    (identifier)
+    (function_type
+      (type_identifier)
+      (type_identifier)))
+  (variable_declaration
+    (identifier)
+    (any_type
+      (type_identifier)))
+  (variable_declaration
+    (identifier)
+    (self_type))
+  (variable_declaration
+    (identifier)
+    (generic_type
+      (type_identifier)
+      (type_arguments
+        (type_identifier)
+        (integer_literal))))
+  (variable_declaration
+    (identifier)
+    (scoped_type_identifier
+      (scoped_type_identifier
+        (type_identifier)
+        (type_identifier))
+      (type_identifier)))
+  (variable_declaration
+    (identifier)
+    (generic_type
+      (type_identifier)
+      (type_arguments
+        (generic_type
+          (type_identifier)
+          (type_arguments
+            (type_identifier))))))
+  (variable_declaration
+    (identifier)
+    (function_type
+      (mode)
+      (type_identifier)
+      (type_identifier))))
+
+========================================
+generic declarations and bounds
+========================================
+
+fn max<T: ordered>(a: T, b: T) -> T { a }
+fn sized<meta N: int>() -> [int; N] { [0; N] }
+fn largest<T>(xs: [T]) -> T? where T: ordered, T: eq { none }
+struct stack<T> { items: [T] }
+type pair<A, B> = (A, B)
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (generic_parameters
+      (generic_parameter
+        (type_identifier)
+        (type_identifier)))
+    (parameter_list
+      (parameter
+        (identifier)
+        (type_identifier))
+      (parameter
+        (identifier)
+        (type_identifier)))
+    (type_identifier)
+    (block
+      (identifier)))
+  (function_declaration
+    (identifier)
+    (generic_parameters
+      (generic_parameter
+        (type_identifier)
+        (type_identifier)))
+    (parameter_list)
+    (array_type
+      (type_identifier)
+      (identifier))
+    (block
+      (repeat_expression
+        (integer_literal)
+        (identifier))))
+  (function_declaration
+    (identifier)
+    (generic_parameters
+      (generic_parameter
+        (type_identifier)))
+    (parameter_list
+      (parameter
+        (identifier)
+        (list_type
+          (type_identifier))))
+    (option_type
+      (type_identifier))
+    (where_clause
+      (where_predicate
+        (type_identifier)
+        (type_identifier))
+      (where_predicate
+        (type_identifier)
+        (type_identifier)))
+    (block
+      (none)))
+  (struct_declaration
+    (type_identifier)
+    (generic_parameters
+      (generic_parameter
+        (type_identifier)))
+    (field_declaration_list
+      (field_declaration
+        (identifier)
+        (list_type
+          (type_identifier)))))
+  (type_alias
+    (type_identifier)
+    (generic_parameters
+      (generic_parameter
+        (type_identifier))
+      (generic_parameter
+        (type_identifier)))
+    (tuple_type
+      (type_identifier)
+      (type_identifier))))

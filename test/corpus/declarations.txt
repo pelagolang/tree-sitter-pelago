@@ -1,0 +1,751 @@
+========================================
+variables
+========================================
+
+const name = "Dennis"
+var score: int = 10
+const (tx, rx) = chan<int>()
+var late: int
+
+---
+
+(source_file
+  (variable_declaration
+    (identifier)
+    (string_literal
+      (string_content)))
+  (variable_declaration
+    (identifier)
+    (type_identifier)
+    (integer_literal))
+  (variable_declaration
+    (tuple_pattern
+      (identifier)
+      (identifier))
+    (call_expression
+      (type_application
+        (identifier)
+        (type_arguments
+          (type_identifier)))
+      (argument_list)))
+  (variable_declaration
+    (identifier)
+    (type_identifier)))
+
+========================================
+functions
+========================================
+
+fn add(a: int, b: int) -> int {
+    a + b
+}
+fn double(x: int) -> int = x * 2
+fn greet(name: string, greeting: string = "Hello") { }
+fn sum(...nums: int) -> int { 0 }
+fn clear(inout xs: [int]) { xs.clear!() }
+fn finish(sink xs: [int]) -> int = xs.len()
+fn parse_int(s: string) -> int ! parse_error { ok(1) }
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (type_identifier))
+      (parameter
+        (identifier)
+        (type_identifier)))
+    (type_identifier)
+    (block
+      (binary_expression
+        (identifier)
+        (identifier))))
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (type_identifier)))
+    (type_identifier)
+    (expression_body
+      (binary_expression
+        (identifier)
+        (integer_literal))))
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (type_identifier))
+      (parameter
+        (identifier)
+        (type_identifier)
+        (string_literal
+          (string_content))))
+    (block))
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (type_identifier)))
+    (type_identifier)
+    (block
+      (integer_literal)))
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (mode)
+        (identifier)
+        (list_type
+          (type_identifier))))
+    (block
+      (call_expression
+        (field_expression
+          (identifier)
+          (identifier))
+        (call_mark)
+        (argument_list))))
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (mode)
+        (identifier)
+        (list_type
+          (type_identifier))))
+    (type_identifier)
+    (expression_body
+      (call_expression
+        (field_expression
+          (identifier)
+          (identifier))
+        (argument_list))))
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (type_identifier)))
+    (result_type
+      (type_identifier)
+      (type_identifier))
+    (block
+      (call_expression
+        (identifier)
+        (argument_list
+          (argument
+            (integer_literal)))))))
+
+========================================
+structs and methods
+========================================
+
+struct point {
+    x: float
+    y: float
+
+    fn length(self) -> float = sqrt(self.x * self.x + self.y * self.y)
+    fn shift(inout self, dx: float, dy: float) { self.x += dx; self.y += dy }
+}
+
+---
+
+(source_file
+  (struct_declaration
+    (type_identifier)
+    (field_declaration_list
+      (field_declaration
+        (identifier)
+        (type_identifier))
+      (field_declaration
+        (identifier)
+        (type_identifier))
+      (function_declaration
+        (identifier)
+        (parameter_list
+          (parameter
+            (self)))
+        (type_identifier)
+        (expression_body
+          (call_expression
+            (identifier)
+            (argument_list
+              (argument
+                (binary_expression
+                  (binary_expression
+                    (field_expression
+                      (self)
+                      (identifier))
+                    (field_expression
+                      (self)
+                      (identifier)))
+                  (binary_expression
+                    (field_expression
+                      (self)
+                      (identifier))
+                    (field_expression
+                      (self)
+                      (identifier)))))))))
+      (function_declaration
+        (identifier)
+        (parameter_list
+          (parameter
+            (mode)
+            (self))
+          (parameter
+            (identifier)
+            (type_identifier))
+          (parameter
+            (identifier)
+            (type_identifier)))
+        (block
+          (assignment_expression
+            (field_expression
+              (self)
+              (identifier))
+            (identifier))
+          (assignment_expression
+            (field_expression
+              (self)
+              (identifier))
+            (identifier)))))))
+
+========================================
+enums
+========================================
+
+/// A shape with a size.
+enum shape {
+    /// A round one.
+    circle(radius: float)
+    rect(w: float, h: float)
+    empty
+}
+enum tree { leaf, node(box<tree>, int, box<tree>) }
+enum color { red = 1, green = 2 }
+
+---
+
+(source_file
+  (doc_comment)
+  (enum_declaration
+    (type_identifier)
+    (enum_body
+      (doc_comment)
+      (enum_variant
+        (identifier)
+        (variant_fields
+          (variant_field
+            (identifier)
+            (type_identifier))))
+      (enum_variant
+        (identifier)
+        (variant_fields
+          (variant_field
+            (identifier)
+            (type_identifier))
+          (variant_field
+            (identifier)
+            (type_identifier))))
+      (enum_variant
+        (identifier))))
+  (enum_declaration
+    (type_identifier)
+    (enum_body
+      (enum_variant
+        (identifier))
+      (enum_variant
+        (identifier)
+        (variant_fields
+          (variant_field
+            (generic_type
+              (type_identifier)
+              (type_arguments
+                (type_identifier))))
+          (variant_field
+            (type_identifier))
+          (variant_field
+            (generic_type
+              (type_identifier)
+              (type_arguments
+                (type_identifier))))))))
+  (enum_declaration
+    (type_identifier)
+    (enum_body
+      (enum_variant
+        (identifier)
+        (integer_literal))
+      (enum_variant
+        (identifier)
+        (integer_literal)))))
+
+========================================
+interfaces and impls
+========================================
+
+interface shape_like {
+    fn area(self) -> float
+}
+struct circle : shape_like { radius: float }
+impl shape_like for rect { }
+impl<T> show for stack<T> where T: show {
+    fn show(self) -> string = "stack"
+}
+impl add for vec2 {
+    fn add(self, other: vec2) -> vec2 = vec2 { x: self.x + other.x, y: self.y + other.y }
+}
+
+---
+
+(source_file
+  (interface_declaration
+    (type_identifier)
+    (field_declaration_list
+      (function_declaration
+        (identifier)
+        (parameter_list
+          (parameter
+            (self)))
+        (type_identifier))))
+  (struct_declaration
+    (type_identifier)
+    (base_types
+      (type_identifier))
+    (field_declaration_list
+      (field_declaration
+        (identifier)
+        (type_identifier))))
+  (impl_declaration
+    (type_identifier)
+    (type_identifier)
+    (declaration_list))
+  (impl_declaration
+    (generic_parameters
+      (generic_parameter
+        (type_identifier)))
+    (type_identifier)
+    (generic_type
+      (type_identifier)
+      (type_arguments
+        (type_identifier)))
+    (where_clause
+      (where_predicate
+        (type_identifier)
+        (type_identifier)))
+    (declaration_list
+      (function_declaration
+        (identifier)
+        (parameter_list
+          (parameter
+            (self)))
+        (type_identifier)
+        (expression_body
+          (string_literal
+            (string_content))))))
+  (impl_declaration
+    (type_identifier)
+    (type_identifier)
+    (declaration_list
+      (function_declaration
+        (identifier)
+        (parameter_list
+          (parameter
+            (self))
+          (parameter
+            (identifier)
+            (type_identifier)))
+        (type_identifier)
+        (expression_body
+          (struct_expression
+            (identifier)
+            (struct_literal_body
+              (field_initializer
+                (identifier)
+                (binary_expression
+                  (field_expression
+                    (self)
+                    (identifier))
+                  (field_expression
+                    (identifier)
+                    (identifier))))
+              (field_initializer
+                (identifier)
+                (binary_expression
+                  (field_expression
+                    (self)
+                    (identifier))
+                  (field_expression
+                    (identifier)
+                    (identifier)))))))))))
+
+========================================
+objects, constructors and inheritance
+========================================
+
+open obj animal {
+    name: string
+    init(name: string) { self.name = name }
+    open fn speak(self) -> string = "..."
+    abstract fn eat(self)
+}
+obj dog : animal {
+    override fn speak(self) -> string = "Woof"
+}
+struct range {
+    lo: int
+    init(lo: int) -> Self ! bad_range {
+        self.lo = lo
+    }
+    deinit { }
+}
+
+---
+
+(source_file
+  (obj_declaration
+    (modifiers
+      (modifier))
+    (type_identifier)
+    (field_declaration_list
+      (field_declaration
+        (identifier)
+        (type_identifier))
+      (constructor_declaration
+        (parameter_list
+          (parameter
+            (identifier)
+            (type_identifier)))
+        (block
+          (assignment_expression
+            (field_expression
+              (self)
+              (identifier))
+            (identifier))))
+      (function_declaration
+        (modifiers
+          (modifier))
+        (identifier)
+        (parameter_list
+          (parameter
+            (self)))
+        (type_identifier)
+        (expression_body
+          (string_literal
+            (string_content))))
+      (function_declaration
+        (modifiers
+          (modifier))
+        (identifier)
+        (parameter_list
+          (parameter
+            (self))))))
+  (obj_declaration
+    (type_identifier)
+    (base_types
+      (type_identifier))
+    (field_declaration_list
+      (function_declaration
+        (modifiers
+          (modifier))
+        (identifier)
+        (parameter_list
+          (parameter
+            (self)))
+        (type_identifier)
+        (expression_body
+          (string_literal
+            (string_content))))))
+  (struct_declaration
+    (type_identifier)
+    (field_declaration_list
+      (field_declaration
+        (identifier)
+        (type_identifier))
+      (constructor_declaration
+        (parameter_list
+          (parameter
+            (identifier)
+            (type_identifier)))
+        (result_type
+          (self_type)
+          (type_identifier))
+        (block
+          (assignment_expression
+            (field_expression
+              (self)
+              (identifier))
+            (identifier))))
+      (destructor_declaration
+        (block)))))
+
+========================================
+attributes and modifiers
+========================================
+
+@inline fn square(x: int) -> int = x * x
+@derive(eq, order, hash, show)
+struct user {
+    pub name: string
+    pub age: int = 18
+}
+linear struct transaction { id: int }
+pub fn commit(sink t: transaction) -> void ! db_error { }
+pub async fn fetch(x: int) -> int { await g(x) }
+unsafe fn poke() { }
+pub static var count: int = 0
+meta fn build_table() -> [int; 256] { table }
+
+---
+
+(source_file
+  (function_declaration
+    (attribute
+      (identifier))
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (type_identifier)))
+    (type_identifier)
+    (expression_body
+      (binary_expression
+        (identifier)
+        (identifier))))
+  (struct_declaration
+    (attribute
+      (identifier)
+      (argument_list
+        (argument
+          (identifier))
+        (argument
+          (identifier))
+        (argument
+          (identifier))
+        (argument
+          (identifier))))
+    (type_identifier)
+    (field_declaration_list
+      (field_declaration
+        (modifiers
+          (visibility_modifier))
+        (identifier)
+        (type_identifier))
+      (field_declaration
+        (modifiers
+          (visibility_modifier))
+        (identifier)
+        (type_identifier)
+        (integer_literal))))
+  (struct_declaration
+    (modifiers
+      (modifier))
+    (type_identifier)
+    (field_declaration_list
+      (field_declaration
+        (identifier)
+        (type_identifier))))
+  (function_declaration
+    (modifiers
+      (visibility_modifier))
+    (identifier)
+    (parameter_list
+      (parameter
+        (mode)
+        (identifier)
+        (type_identifier)))
+    (result_type
+      (type_identifier)
+      (type_identifier))
+    (block))
+  (function_declaration
+    (modifiers
+      (visibility_modifier))
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (type_identifier)))
+    (type_identifier)
+    (block
+      (await_expression
+        (call_expression
+          (identifier)
+          (argument_list
+            (argument
+              (identifier)))))))
+  (function_declaration
+    (modifiers)
+    (identifier)
+    (parameter_list)
+    (block))
+  (variable_declaration
+    (modifiers
+      (visibility_modifier)
+      (modifier))
+    (identifier)
+    (type_identifier)
+    (integer_literal))
+  (function_declaration
+    (modifiers)
+    (identifier)
+    (parameter_list)
+    (array_type
+      (type_identifier)
+      (integer_literal))
+    (block
+      (identifier))))
+
+========================================
+ext functions
+========================================
+
+ext fn puts(s: ptr) -> int
+ext "C" fn abs(x: int) -> int
+pub ext fn print(...values: any show)
+
+---
+
+(source_file
+  (function_declaration
+    (modifiers
+      (ext_modifier))
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (type_identifier)))
+    (type_identifier))
+  (function_declaration
+    (modifiers
+      (ext_modifier)
+      (string_literal
+        (string_content)))
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (type_identifier)))
+    (type_identifier))
+  (function_declaration
+    (modifiers
+      (visibility_modifier)
+      (ext_modifier))
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (any_type
+          (type_identifier))))))
+
+========================================
+modules, imports and tests
+========================================
+
+mod tour
+mod inner { fn f() { } }
+import std
+import { list, map: dict } = std.collections
+import fmt = std.io
+import { ... } = std.math
+import { helper } = .util
+import ..shared.strings
+pub import { read } = std.io
+use std.io
+type id = int64
+test "addition works" {
+    assert(add(1, 2) == 3)
+}
+
+---
+
+(source_file
+  (mod_declaration
+    (module_path
+      (identifier)))
+  (mod_declaration
+    (module_path
+      (identifier))
+    (block
+      (function_declaration
+        (identifier)
+        (parameter_list)
+        (block))))
+  (import_declaration
+    (import_path
+      (module_path
+        (identifier))))
+  (import_declaration
+    (import_names
+      (import_name
+        (identifier))
+      (import_name
+        (identifier)
+        (identifier)))
+    (import_path
+      (module_path
+        (identifier)
+        (identifier))))
+  (import_declaration
+    (identifier)
+    (import_path
+      (module_path
+        (identifier)
+        (identifier))))
+  (import_declaration
+    (import_names)
+    (import_path
+      (module_path
+        (identifier)
+        (identifier))))
+  (import_declaration
+    (import_names
+      (import_name
+        (identifier)))
+    (import_path
+      (module_path
+        (identifier))))
+  (import_declaration
+    (import_path
+      (module_path
+        (identifier)
+        (identifier))))
+  (import_declaration
+    (modifiers
+      (visibility_modifier))
+    (import_names
+      (import_name
+        (identifier)))
+    (import_path
+      (module_path
+        (identifier)
+        (identifier))))
+  (import_declaration
+    (import_path
+      (module_path
+        (identifier)
+        (identifier))))
+  (type_alias
+    (type_identifier)
+    (type_identifier))
+  (test_declaration
+    (string_literal
+      (string_content))
+    (block
+      (call_expression
+        (identifier)
+        (argument_list
+          (argument
+            (binary_expression
+              (call_expression
+                (identifier)
+                (argument_list
+                  (argument
+                    (integer_literal))
+                  (argument
+                    (integer_literal))))
+              (integer_literal))))))))

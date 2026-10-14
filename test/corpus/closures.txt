@@ -1,0 +1,308 @@
+========================================
+closure forms
+========================================
+
+const a = x ~> x * 2
+const b = ~> it * 3
+const c = (a: int, b: int) ~> a + b
+const d = (x: int) -> int ~> x * 2
+const e = [inout total] x ~> total += x
+const f = [inout total, sink data] (x, y) ~> total += x * y
+const g = [inout n] (a: int, b: int) -> int ~> {
+    n += 1
+    a + b
+}
+const h = (a) -> map<string, int> ~> m
+
+---
+
+(source_file
+  (variable_declaration
+    (identifier)
+    (closure_expression
+      (closure_parameter
+        (identifier))
+      (binary_expression
+        (identifier)
+        (integer_literal))))
+  (variable_declaration
+    (identifier)
+    (closure_expression
+      (binary_expression
+        (identifier)
+        (integer_literal))))
+  (variable_declaration
+    (identifier)
+    (closure_expression
+      (closure_parameters
+        (closure_parameter
+          (identifier)
+          (type_identifier))
+        (closure_parameter
+          (identifier)
+          (type_identifier)))
+      (binary_expression
+        (identifier)
+        (identifier))))
+  (variable_declaration
+    (identifier)
+    (closure_expression
+      (closure_parameters
+        (closure_parameter
+          (identifier)
+          (type_identifier)))
+      (type_identifier)
+      (binary_expression
+        (identifier)
+        (integer_literal))))
+  (variable_declaration
+    (identifier)
+    (closure_expression
+      (closure_captures
+        (capture
+          (mode)
+          (identifier)))
+      (closure_parameter
+        (identifier))
+      (assignment_expression
+        (identifier)
+        (identifier))))
+  (variable_declaration
+    (identifier)
+    (closure_expression
+      (closure_captures
+        (capture
+          (mode)
+          (identifier))
+        (capture
+          (mode)
+          (identifier)))
+      (closure_parameters
+        (closure_parameter
+          (identifier))
+        (closure_parameter
+          (identifier)))
+      (assignment_expression
+        (identifier)
+        (binary_expression
+          (identifier)
+          (identifier)))))
+  (variable_declaration
+    (identifier)
+    (closure_expression
+      (closure_captures
+        (capture
+          (mode)
+          (identifier)))
+      (closure_parameters
+        (closure_parameter
+          (identifier)
+          (type_identifier))
+        (closure_parameter
+          (identifier)
+          (type_identifier)))
+      (type_identifier)
+      (block
+        (assignment_expression
+          (identifier)
+          (integer_literal))
+        (binary_expression
+          (identifier)
+          (identifier)))))
+  (variable_declaration
+    (identifier)
+    (closure_expression
+      (closure_parameters
+        (closure_parameter
+          (identifier)))
+      (generic_type
+        (type_identifier)
+        (type_arguments
+          (type_identifier)
+          (type_identifier)))
+      (identifier))))
+
+========================================
+closures as arguments
+========================================
+
+numbers.each([inout total] x ~> total += x)
+hits.with!(n ~> n += 1)
+par_for(inout xs, x ~> x *= 2)
+const doubled = numbers.map(x ~> x * 2)
+s.spawn([inout left] ~> left = sum(xs[..mid]))
+
+---
+
+(source_file
+  (call_expression
+    (field_expression
+      (identifier)
+      (identifier))
+    (argument_list
+      (argument
+        (closure_expression
+          (closure_captures
+            (capture
+              (mode)
+              (identifier)))
+          (closure_parameter
+            (identifier))
+          (assignment_expression
+            (identifier)
+            (identifier))))))
+  (call_expression
+    (field_expression
+      (identifier)
+      (identifier))
+    (call_mark)
+    (argument_list
+      (argument
+        (closure_expression
+          (closure_parameter
+            (identifier))
+          (assignment_expression
+            (identifier)
+            (integer_literal))))))
+  (call_expression
+    (identifier)
+    (argument_list
+      (argument
+        (mode)
+        (identifier))
+      (argument
+        (closure_expression
+          (closure_parameter
+            (identifier))
+          (assignment_expression
+            (identifier)
+            (integer_literal))))))
+  (variable_declaration
+    (identifier)
+    (call_expression
+      (field_expression
+        (identifier)
+        (identifier))
+      (argument_list
+        (argument
+          (closure_expression
+            (closure_parameter
+              (identifier))
+            (binary_expression
+              (identifier)
+              (integer_literal)))))))
+  (call_expression
+    (field_expression
+      (identifier)
+      (identifier))
+    (argument_list
+      (argument
+        (closure_expression
+          (closure_captures
+            (capture
+              (mode)
+              (identifier)))
+          (assignment_expression
+            (identifier)
+            (call_expression
+              (identifier)
+              (argument_list
+                (argument
+                  (index_expression
+                    (identifier)
+                    (range_expression
+                      (identifier))))))))))))
+
+========================================
+builders
+========================================
+
+const a = [x of xs if x > 0 ~> x * 2]
+const b = [i, x of xs ~> "#i: #x"]
+const c = [x of xs, y of ys if x != y ~> (x, y)]
+const d = set { x of xs ~> x % 10 }
+const e = map { u of users ~> u.name : u.age }
+const f = sum(x of xs if x > 0 ~> x * x)
+
+---
+
+(source_file
+  (variable_declaration
+    (identifier)
+    (list_builder
+      (builder_clause
+        (identifier)
+        (identifier))
+      (builder_clause
+        (binary_expression
+          (identifier)
+          (integer_literal)))
+      (binary_expression
+        (identifier)
+        (integer_literal))))
+  (variable_declaration
+    (identifier)
+    (list_builder
+      (builder_clause
+        (identifier)
+        (identifier)
+        (identifier))
+      (string_literal
+        (interpolation
+          (identifier))
+        (string_content)
+        (interpolation
+          (identifier)))))
+  (variable_declaration
+    (identifier)
+    (list_builder
+      (builder_clause
+        (identifier)
+        (identifier))
+      (builder_clause
+        (identifier)
+        (identifier))
+      (builder_clause
+        (binary_expression
+          (identifier)
+          (identifier)))
+      (tuple_expression
+        (identifier)
+        (identifier))))
+  (variable_declaration
+    (identifier)
+    (set_builder
+      (builder_clause
+        (identifier)
+        (identifier))
+      (binary_expression
+        (identifier)
+        (integer_literal))))
+  (variable_declaration
+    (identifier)
+    (map_builder
+      (builder_clause
+        (identifier)
+        (identifier))
+      (field_expression
+        (identifier)
+        (identifier))
+      (field_expression
+        (identifier)
+        (identifier))))
+  (variable_declaration
+    (identifier)
+    (call_expression
+      (identifier)
+      (argument_list
+        (stream_builder
+          (builder_clause
+            (identifier)
+            (identifier))
+          (builder_clause
+            (binary_expression
+              (identifier)
+              (integer_literal)))
+          (binary_expression
+            (identifier)
+            (identifier)))))))

@@ -1,0 +1,230 @@
+========================================
+integers
+========================================
+
+const a = 42
+const b = 1_000_000
+const c = 0xFF_ff
+const d = 0b1010
+const e = 0o755
+
+---
+
+(source_file
+  (variable_declaration
+    (identifier)
+    (integer_literal))
+  (variable_declaration
+    (identifier)
+    (integer_literal))
+  (variable_declaration
+    (identifier)
+    (integer_literal))
+  (variable_declaration
+    (identifier)
+    (integer_literal))
+  (variable_declaration
+    (identifier)
+    (integer_literal)))
+
+========================================
+floats
+========================================
+
+const a = 3.14
+const b = 1e-3
+const c = 2.5E+10
+const d = 1_000.000_1
+
+---
+
+(source_file
+  (variable_declaration
+    (identifier)
+    (float_literal))
+  (variable_declaration
+    (identifier)
+    (float_literal))
+  (variable_declaration
+    (identifier)
+    (float_literal))
+  (variable_declaration
+    (identifier)
+    (float_literal)))
+
+========================================
+tuple index is an integer, not a float
+========================================
+
+t.0.1
+x?.0
+
+---
+
+(source_file
+  (field_expression
+    (field_expression
+      (identifier)
+      (tuple_index))
+    (tuple_index))
+  (field_expression
+    (identifier)
+    (tuple_index)))
+
+========================================
+characters
+========================================
+
+const a = 'a'
+const b = '\t'
+const c = '\''
+const d = '"'
+const e = '\u{1F600}'
+const f = 'é'
+
+---
+
+(source_file
+  (variable_declaration
+    (identifier)
+    (character_literal))
+  (variable_declaration
+    (identifier)
+    (character_literal))
+  (variable_declaration
+    (identifier)
+    (character_literal))
+  (variable_declaration
+    (identifier)
+    (character_literal))
+  (variable_declaration
+    (identifier)
+    (character_literal))
+  (variable_declaration
+    (identifier)
+    (character_literal)))
+
+========================================
+strings and escapes
+========================================
+
+const a = "plain"
+const b = "tab\tnewline\n quote\" hash\# unicode \u{41}"
+const c = ""
+
+---
+
+(source_file
+  (variable_declaration
+    (identifier)
+    (string_literal
+      (string_content)))
+  (variable_declaration
+    (identifier)
+    (string_literal
+      (string_content)
+      (escape_sequence)
+      (string_content)
+      (escape_sequence)
+      (string_content)
+      (escape_sequence)
+      (string_content)
+      (escape_sequence)
+      (string_content)
+      (escape_sequence)))
+  (variable_declaration
+    (identifier)
+    (string_literal)))
+
+========================================
+string interpolation
+========================================
+
+print("Score: #score, next: #(score + 1), name: #(name)")
+const nested = "a #(f("x #(y)")) b"
+
+---
+
+(source_file
+  (call_expression
+    (identifier)
+    (argument_list
+      (argument
+        (string_literal
+          (string_content)
+          (interpolation
+            (identifier))
+          (string_content)
+          (interpolation
+            (binary_expression
+              (identifier)
+              (integer_literal)))
+          (string_content)
+          (interpolation
+            (identifier))))))
+  (variable_declaration
+    (identifier)
+    (string_literal
+      (string_content)
+      (interpolation
+        (call_expression
+          (identifier)
+          (argument_list
+            (argument
+              (string_literal
+                (string_content)
+                (interpolation
+                  (identifier)))))))
+      (string_content))))
+
+========================================
+booleans, none and self
+========================================
+
+const a = true
+const b = false
+const c = none
+self.x = self
+
+---
+
+(source_file
+  (variable_declaration
+    (identifier)
+    (boolean_literal))
+  (variable_declaration
+    (identifier)
+    (boolean_literal))
+  (variable_declaration
+    (identifier)
+    (none))
+  (assignment_expression
+    (field_expression
+      (self)
+      (identifier))
+    (self)))
+
+========================================
+comments
+========================================
+
+// line comment
+/// doc comment
+//// not a doc comment
+/* block /* nested */ still a comment */
+///* doc
+block *///
+const x = 1 // trailing
+
+---
+
+(source_file
+  (line_comment)
+  (doc_comment)
+  (line_comment)
+  (block_comment)
+  (doc_block_comment)
+  (variable_declaration
+    (identifier)
+    (integer_literal))
+  (line_comment))

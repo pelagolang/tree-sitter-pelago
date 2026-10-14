@@ -1,0 +1,459 @@
+========================================
+arithmetic precedence
+========================================
+
+1 + 2 * 3
+(1 + 2) * 3
+a - b - c
+a +% b *% c
+a << 1 + 2
+
+---
+
+(source_file
+  (binary_expression
+    (integer_literal)
+    (binary_expression
+      (integer_literal)
+      (integer_literal)))
+  (binary_expression
+    (parenthesized_expression
+      (binary_expression
+        (integer_literal)
+        (integer_literal)))
+    (integer_literal))
+  (binary_expression
+    (binary_expression
+      (identifier)
+      (identifier))
+    (identifier))
+  (binary_expression
+    (identifier)
+    (binary_expression
+      (identifier)
+      (identifier)))
+  (binary_expression
+    (identifier)
+    (binary_expression
+      (integer_literal)
+      (integer_literal))))
+
+========================================
+bitwise binds tighter than comparison
+========================================
+
+a & b == c
+a | b ^ c & d
+const mixed = a & b | c ^ d << 2 >> 1
+
+---
+
+(source_file
+  (binary_expression
+    (binary_expression
+      (identifier)
+      (identifier))
+    (identifier))
+  (binary_expression
+    (identifier)
+    (binary_expression
+      (identifier)
+      (binary_expression
+        (identifier)
+        (identifier))))
+  (variable_declaration
+    (identifier)
+    (binary_expression
+      (binary_expression
+        (identifier)
+        (identifier))
+      (binary_expression
+        (identifier)
+        (binary_expression
+          (binary_expression
+            (identifier)
+            (integer_literal))
+          (integer_literal))))))
+
+========================================
+logical operators and unary
+========================================
+
+a || b && c
+0 < x && x < 10
+a == b || !c
+!!x
+~mask
+-x
+
+---
+
+(source_file
+  (binary_expression
+    (identifier)
+    (binary_expression
+      (identifier)
+      (identifier)))
+  (binary_expression
+    (binary_expression
+      (integer_literal)
+      (identifier))
+    (binary_expression
+      (identifier)
+      (integer_literal)))
+  (binary_expression
+    (binary_expression
+      (identifier)
+      (identifier))
+    (unary_expression
+      (identifier)))
+  (unary_expression
+    (identifier))
+  (unary_expression
+    (identifier))
+  (unary_expression
+    (identifier)))
+
+========================================
+power is right associative and binds tighter than unary minus
+========================================
+
+2 ** 3 ** 2
+-2 ** 2
+
+---
+
+(source_file
+  (binary_expression
+    (integer_literal)
+    (binary_expression
+      (integer_literal)
+      (integer_literal)))
+  (unary_expression
+    (binary_expression
+      (integer_literal)
+      (integer_literal))))
+
+========================================
+ternary
+========================================
+
+a ? b : c
+a ? b : c ? d : e
+const grade = {score > 90 ? "A" : score > 80 ? "B" : "C"}
+
+---
+
+(source_file
+  (ternary_expression
+    (identifier)
+    (identifier)
+    (identifier))
+  (ternary_expression
+    (identifier)
+    (identifier)
+    (ternary_expression
+      (identifier)
+      (identifier)
+      (identifier)))
+  (variable_declaration
+    (identifier)
+    (block
+      (ternary_expression
+        (binary_expression
+          (identifier)
+          (integer_literal))
+        (string_literal
+          (string_content))
+        (ternary_expression
+          (binary_expression
+            (identifier)
+            (integer_literal))
+          (string_literal
+            (string_content))
+          (string_literal
+            (string_content)))))))
+
+========================================
+assignment
+========================================
+
+a = b = c
+x += 1
+h *%= 31
+v ??= 3
+score++
+j--
+
+---
+
+(source_file
+  (assignment_expression
+    (identifier)
+    (assignment_expression
+      (identifier)
+      (identifier)))
+  (assignment_expression
+    (identifier)
+    (integer_literal))
+  (assignment_expression
+    (identifier)
+    (integer_literal))
+  (assignment_expression
+    (identifier)
+    (integer_literal))
+  (update_expression
+    (identifier))
+  (update_expression
+    (identifier)))
+
+========================================
+pipelines and null coalescing
+========================================
+
+raw |> trim |> parse
+a ?? b ?? c
+a ?? b |> f
+user?.name ?? "anonymous"
+
+---
+
+(source_file
+  (binary_expression
+    (binary_expression
+      (identifier)
+      (identifier))
+    (identifier))
+  (binary_expression
+    (binary_expression
+      (identifier)
+      (identifier))
+    (identifier))
+  (binary_expression
+    (binary_expression
+      (identifier)
+      (identifier))
+    (identifier))
+  (binary_expression
+    (field_expression
+      (identifier)
+      (identifier))
+    (string_literal
+      (string_content))))
+
+========================================
+ranges
+========================================
+
+0..10
+0..=10
+xs[2..]
+xs[..3]
+xs[-3..]
+0..10 step 2
+0..n + 1
+x in 1..10 && y
+
+---
+
+(source_file
+  (range_expression
+    (integer_literal)
+    (integer_literal))
+  (range_expression
+    (integer_literal)
+    (integer_literal))
+  (index_expression
+    (identifier)
+    (range_expression
+      (integer_literal)))
+  (index_expression
+    (identifier)
+    (range_expression
+      (integer_literal)))
+  (index_expression
+    (identifier)
+    (range_expression
+      (unary_expression
+        (integer_literal))))
+  (range_expression
+    (range_expression
+      (integer_literal)
+      (integer_literal))
+    (integer_literal))
+  (range_expression
+    (integer_literal)
+    (binary_expression
+      (identifier)
+      (integer_literal)))
+  (binary_expression
+    (binary_expression
+      (identifier)
+      (range_expression
+        (integer_literal)
+        (integer_literal)))
+    (identifier)))
+
+========================================
+conversions
+========================================
+
+x to float
+pet to? dog
+a + b to float
+x to int ? a : b
+
+---
+
+(source_file
+  (convert_expression
+    (identifier)
+    (type_identifier))
+  (convert_expression
+    (identifier)
+    (type_identifier))
+  (convert_expression
+    (binary_expression
+      (identifier)
+      (identifier))
+    (type_identifier))
+  (ternary_expression
+    (convert_expression
+      (identifier)
+      (type_identifier))
+    (identifier)
+    (identifier)))
+
+========================================
+is and in
+========================================
+
+shape is .circle(r)
+args is [cmd, ...rest]
+a in b
+x is some(v) && y
+
+---
+
+(source_file
+  (is_expression
+    (identifier)
+    (variant_pattern
+      (identifier)
+      (pattern_arguments
+        (pattern_argument
+          (identifier)))))
+  (is_expression
+    (identifier)
+    (list_pattern
+      (identifier)
+      (rest_pattern
+        (identifier))))
+  (binary_expression
+    (identifier)
+    (identifier))
+  (binary_expression
+    (is_expression
+      (identifier)
+      (variant_pattern
+        (identifier)
+        (pattern_arguments
+          (pattern_argument
+            (identifier)))))
+    (identifier)))
+
+========================================
+field access, calls and indexing
+========================================
+
+a.b.c(1).d
+f(1, 2)(3)
+xs[i][j]
+f(x)?.y
+(1).foo
+"s".len()
+
+---
+
+(source_file
+  (field_expression
+    (call_expression
+      (field_expression
+        (field_expression
+          (identifier)
+          (identifier))
+        (identifier))
+      (argument_list
+        (argument
+          (integer_literal))))
+    (identifier))
+  (call_expression
+    (call_expression
+      (identifier)
+      (argument_list
+        (argument
+          (integer_literal))
+        (argument
+          (integer_literal))))
+    (argument_list
+      (argument
+        (integer_literal))))
+  (index_expression
+    (index_expression
+      (identifier)
+      (identifier))
+    (identifier))
+  (field_expression
+    (call_expression
+      (identifier)
+      (argument_list
+        (argument
+          (identifier))))
+    (identifier))
+  (field_expression
+    (parenthesized_expression
+      (integer_literal))
+    (identifier))
+  (call_expression
+    (field_expression
+      (string_literal
+        (string_content))
+      (identifier))
+    (argument_list)))
+
+========================================
+copy, await, meta, unsafe
+========================================
+
+copy xs[1..3]
+await f()?
+meta build()
+unsafe { poke(ptr, 1) }
+
+---
+
+(source_file
+  (copy_expression
+    (index_expression
+      (identifier)
+      (range_expression
+        (integer_literal)
+        (integer_literal))))
+  (await_expression
+    (try_expression
+      (call_expression
+        (identifier)
+        (argument_list))))
+  (meta_expression
+    (call_expression
+      (identifier)
+      (argument_list)))
+  (unsafe_block
+    (block
+      (call_expression
+        (identifier)
+        (argument_list
+          (argument
+            (identifier))
+          (argument
+            (integer_literal)))))))

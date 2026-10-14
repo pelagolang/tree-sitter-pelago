@@ -1,0 +1,123 @@
+========================================
+lists, repeats and tuples
+========================================
+
+const a = [1, 2, ...xs, 3]
+const b = [0; 9]
+const c = []
+const d = (1, 2)
+const e = (1,)
+const f = ()
+
+---
+
+(source_file
+  (variable_declaration
+    (identifier)
+    (list_expression
+      (integer_literal)
+      (integer_literal)
+      (spread_element
+        (identifier))
+      (integer_literal)))
+  (variable_declaration
+    (identifier)
+    (repeat_expression
+      (integer_literal)
+      (integer_literal)))
+  (variable_declaration
+    (identifier)
+    (list_expression))
+  (variable_declaration
+    (identifier)
+    (tuple_expression
+      (integer_literal)
+      (integer_literal)))
+  (variable_declaration
+    (identifier)
+    (tuple_expression
+      (integer_literal)))
+  (variable_declaration
+    (identifier)
+    (tuple_expression)))
+
+========================================
+maps and sets
+========================================
+
+const a = map { "a": [1, 2], "b": [] }
+const b = {:}
+const c = map { "a": 1, ...d }
+const d = set { 1, 2 }
+const e = set {}
+
+---
+
+(source_file
+  (variable_declaration
+    (identifier)
+    (map_expression
+      (map_pair
+        (string_literal
+          (string_content))
+        (list_expression
+          (integer_literal)
+          (integer_literal)))
+      (map_pair
+        (string_literal
+          (string_content))
+        (list_expression))))
+  (variable_declaration
+    (identifier)
+    (map_expression))
+  (variable_declaration
+    (identifier)
+    (map_expression
+      (map_pair
+        (string_literal
+          (string_content))
+        (integer_literal))
+      (spread_element
+        (identifier))))
+  (variable_declaration
+    (identifier)
+    (set_expression
+      (integer_literal)
+      (integer_literal)))
+  (variable_declaration
+    (identifier)
+    (set_expression)))
+
+========================================
+soa and slices
+========================================
+
+var cloud: soa<point> = soa []
+cloud.push!(point { x: 1.0, y: 2.0 })
+
+---
+
+(source_file
+  (variable_declaration
+    (identifier)
+    (generic_type
+      (type_identifier)
+      (type_arguments
+        (type_identifier)))
+    (soa_expression))
+  (call_expression
+    (field_expression
+      (identifier)
+      (identifier))
+    (call_mark)
+    (argument_list
+      (argument
+        (struct_expression
+          (identifier)
+          (struct_literal_body
+            (field_initializer
+              (identifier)
+              (float_literal))
+            (field_initializer
+              (identifier)
+              (float_literal))))))))

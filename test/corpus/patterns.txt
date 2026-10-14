@@ -1,0 +1,216 @@
+========================================
+literal, range and negative patterns
+========================================
+
+switch n {
+    case -1: "minus one"
+    case 0..10, 20..=30: "range"
+    case ..0: "negative"
+    case 100..: "big"
+    case big is 100..=999: "three digits"
+    case 'a': "a"
+    case "": "empty"
+}
+
+---
+
+(source_file
+  (switch_expression
+    (identifier)
+    (switch_body
+      (switch_arm
+        (negated_literal
+          (integer_literal))
+        (string_literal
+          (string_content)))
+      (switch_arm
+        (range_pattern
+          (integer_literal)
+          (integer_literal))
+        (range_pattern
+          (integer_literal)
+          (integer_literal))
+        (string_literal
+          (string_content)))
+      (switch_arm
+        (range_pattern
+          (integer_literal))
+        (string_literal
+          (string_content)))
+      (switch_arm
+        (range_pattern
+          (integer_literal))
+        (string_literal
+          (string_content)))
+      (switch_arm
+        (as_pattern
+          (identifier)
+          (range_pattern
+            (integer_literal)
+            (integer_literal)))
+        (string_literal
+          (string_content)))
+      (switch_arm
+        (character_literal)
+        (string_literal
+          (string_content)))
+      (switch_arm
+        (string_literal)
+        (string_literal
+          (string_content))))))
+
+========================================
+variant and struct patterns
+========================================
+
+switch s {
+    case .rect(w: width, h): width * h
+    case shape.circle(radius): radius
+    case point { x: 0, y: 0 }: "origin"
+    case point { x, .. }: "x"
+    case .circle(r), .square(r): "one measure"
+    case ok(.circle(r)): r
+    case some(_): "small"
+    case none: "missing"
+}
+
+---
+
+(source_file
+  (switch_expression
+    (identifier)
+    (switch_body
+      (switch_arm
+        (variant_pattern
+          (identifier)
+          (pattern_arguments
+            (pattern_argument
+              (identifier)
+              (identifier))
+            (pattern_argument
+              (identifier))))
+        (binary_expression
+          (identifier)
+          (identifier)))
+      (switch_arm
+        (variant_pattern
+          (scoped_identifier
+            (identifier)
+            (identifier))
+          (pattern_arguments
+            (pattern_argument
+              (identifier))))
+        (identifier))
+      (switch_arm
+        (struct_pattern
+          (identifier)
+          (field_pattern
+            (identifier)
+            (integer_literal))
+          (field_pattern
+            (identifier)
+            (integer_literal)))
+        (string_literal
+          (string_content)))
+      (switch_arm
+        (struct_pattern
+          (identifier)
+          (field_pattern
+            (identifier)))
+        (string_literal
+          (string_content)))
+      (switch_arm
+        (variant_pattern
+          (identifier)
+          (pattern_arguments
+            (pattern_argument
+              (identifier))))
+        (variant_pattern
+          (identifier)
+          (pattern_arguments
+            (pattern_argument
+              (identifier))))
+        (string_literal
+          (string_content)))
+      (switch_arm
+        (variant_pattern
+          (identifier)
+          (pattern_arguments
+            (pattern_argument
+              (variant_pattern
+                (identifier)
+                (pattern_arguments
+                  (pattern_argument
+                    (identifier)))))))
+        (identifier))
+      (switch_arm
+        (variant_pattern
+          (identifier)
+          (pattern_arguments
+            (pattern_argument
+              (identifier))))
+        (string_literal
+          (string_content)))
+      (switch_arm
+        (none)
+        (string_literal
+          (string_content))))))
+
+========================================
+tuple and list patterns
+========================================
+
+switch xs {
+    case []: 0
+    case [h, ...t]: h
+    case [first, ..., last]: first
+    case [0, ...rest] if rest.len() > 3: 1
+    case ["add", name]: 2
+    case (a, b): 3
+}
+
+---
+
+(source_file
+  (switch_expression
+    (identifier)
+    (switch_body
+      (switch_arm
+        (list_pattern)
+        (integer_literal))
+      (switch_arm
+        (list_pattern
+          (identifier)
+          (rest_pattern
+            (identifier)))
+        (identifier))
+      (switch_arm
+        (list_pattern
+          (identifier)
+          (rest_pattern)
+          (identifier))
+        (identifier))
+      (switch_arm
+        (list_pattern
+          (integer_literal)
+          (rest_pattern
+            (identifier)))
+        (binary_expression
+          (call_expression
+            (field_expression
+              (identifier)
+              (identifier))
+            (argument_list))
+          (integer_literal))
+        (integer_literal))
+      (switch_arm
+        (list_pattern
+          (string_literal
+            (string_content))
+          (identifier))
+        (integer_literal))
+      (switch_arm
+        (tuple_pattern
+          (identifier)
+          (identifier))
+        (integer_literal)))))

@@ -220,7 +220,7 @@ module.exports = grammar({
         optional(seq('=', field('default', $._expression))),
       ),
 
-    generic_parameters: ($) => seq($._generic_lt, commaSep1($.generic_parameter), '>'),
+    generic_parameters: ($) => seq(alias($._generic_lt, '<'), commaSep1($.generic_parameter), '>'),
 
     generic_parameter: ($) =>
       seq(
@@ -360,7 +360,7 @@ module.exports = grammar({
     generic_type: ($) =>
       seq(field('type', choice($._type_name, $.scoped_type_identifier)), field('arguments', $.type_arguments)),
 
-    type_arguments: ($) => seq($._generic_lt, commaSep1($._generic_argument), '>'),
+    type_arguments: ($) => seq(alias($._generic_lt, '<'), commaSep1($._generic_argument), '>'),
 
     _expr_type_arguments: ($) =>
       seq(alias($._generic_lt_expr, '<'), commaSep1($._generic_argument), '>'),
@@ -690,8 +690,12 @@ module.exports = grammar({
         optional(seq('~>', field('result', $._expression), optional(seq(':', field('value', $._expression))))),
       ),
 
+    // The source and the condition are operands, not full expressions: `xs ~>` there ends the clause, it does not start a closure.
     builder_clause: ($) =>
-      choice(seq(commaSep1(field('pattern', $._pattern)), 'of', field('source', $._expression)), seq('if', field('condition', $._expression))),
+      choice(
+        seq(commaSep1(field('pattern', $._pattern)), 'of', field('source', $._operand)),
+        seq('if', field('condition', $._operand)),
+      ),
 
     list_builder: ($) => seq(alias($._builder_lbracket, '['), $._builder_core, ']'),
     set_builder: ($) => seq(alias($._set_kw, 'set'), alias($._builder_lbrace, '{'), $._builder_core, '}'),
@@ -723,7 +727,7 @@ module.exports = grammar({
 
     closure_parameter: ($) => seq(field('pattern', $._pattern), optional(seq(':', field('type', $._type)))),
 
-    // `x ~> e`: in a builder, `xs ~>` is the end of a clause, so the expression reading is preferred there.
+    // `x ~> e`. In a builder clause such as `[x of return y ~> z]` the expression reading is preferred.
     _lone_parameter: ($) => prec(-1, field('pattern', $.identifier)),
 
     // ---- Control flow ------------------------------------------------------------------------

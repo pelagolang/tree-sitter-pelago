@@ -844,8 +844,13 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "SYMBOL",
-          "name": "_generic_lt"
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_generic_lt"
+          },
+          "named": false,
+          "value": "<"
         },
         {
           "type": "SEQ",
@@ -2454,8 +2459,13 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "SYMBOL",
-          "name": "_generic_lt"
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_generic_lt"
+          },
+          "named": false,
+          "value": "<"
         },
         {
           "type": "SEQ",
@@ -5945,7 +5955,7 @@
               "name": "source",
               "content": {
                 "type": "SYMBOL",
-                "name": "_expression"
+                "name": "_operand"
               }
             }
           ]
@@ -5962,7 +5972,7 @@
               "name": "condition",
               "content": {
                 "type": "SYMBOL",
-                "name": "_expression"
+                "name": "_operand"
               }
             }
           ]
