@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Parses every example of the Pelago compiler repository (and its core library) with this grammar.
+# Parses every .pel file of the Pelago compiler repository (examples, benches, tests and the core library) with this grammar.
 # Exits with a non-zero status when any file has an ERROR or MISSING node.
 #
 #   script/check-corpus.sh /path/to/pelago
@@ -23,8 +23,7 @@ else
 fi
 
 files=()
-while IFS= read -r f; do files+=("$f"); done < <(find "$repo/examples" -name '*.pel' | sort)
-if [ -f "$repo/compiler/core/core.pel" ]; then files+=("$repo/compiler/core/core.pel"); fi
+while IFS= read -r f; do files+=("$f"); done < <(find "$repo" -name '*.pel' -not -path '*/target/*' -not -path '*/.git/*' | sort)
 if [ ${#files[@]} -eq 0 ]; then
   echo "no .pel files found under $repo" >&2
   exit 2

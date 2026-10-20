@@ -30,7 +30,7 @@ npx tree-sitter generate --abi 14   # after changing grammar.js or src/scanner.c
 npx tree-sitter test             # the corpus in test/corpus
 npx tree-sitter parse file.pel   # print a syntax tree
 npx tree-sitter highlight file.pel   # needs a configured parser directory
-script/check-corpus.sh /path/to/pelago   # every example plus compiler/core/core.pel
+script/check-corpus.sh /path/to/pelago   # every .pel file of the checkout
 ```
 
 The generated parser uses language ABI 14, which every current editor can load (Neovim 0.10 and later,
@@ -94,7 +94,7 @@ scanned, because they cannot be written as a regular expression.
 ## How it is checked
 
 * `tree-sitter test` runs `test/corpus/*.txt`, small snippets per construct with the expected trees.
-* `script/check-corpus.sh <pelago checkout>` parses `examples/**/*.pel` and `compiler/core/core.pel` (about 2000
+* `script/check-corpus.sh <pelago checkout>` parses every `.pel` file (examples, benches, tests, `compiler/core/core.pel`) (about 2000
   lines of real library code) and exits non-zero on any `ERROR` or `MISSING` node.
 * The snippets in the compiler's parser tests (`compiler/src/parser/tests.rs`: the arguments of `one(...)`, `all(...)`,
   `assert_clean(...)` and `assert_flagged(...)`) and the code blocks of its design documents were also parsed with

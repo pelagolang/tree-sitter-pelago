@@ -1,0 +1,10 @@
+const it = 3
+// <- keyword
+//    ^ variable
+const a = xs.map(~> it * 2)
+//                  ^ variable.builtin
+const b = xs.filter(~> it > 0).map(~> f(it))
+//                     ^ variable.builtin
+//                                       ^ variable.builtin
+for it in xs { }
+//  ^ variable

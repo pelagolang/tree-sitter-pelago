@@ -18,6 +18,13 @@
 ((identifier) @variable.builtin
  (#eq? @variable.builtin "_"))
 
+; `it` is the implicit parameter of a closure written without any: `xs.map(~> it * 2)`. The grammar cannot tell it
+; from an ordinary name, so the places that bind a name override this below.
+((identifier) @variable.builtin
+ (#eq? @variable.builtin "it"))
+(variable_declaration pattern: (identifier) @variable)
+(for_expression pattern: (identifier) @variable)
+
 (self) @variable.builtin
 (super) @variable.builtin
 (self_type) @type.builtin
