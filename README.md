@@ -145,3 +145,7 @@ require("nvim-treesitter.parsers").get_parser_configs().pelago = {
 
 Then run `:TSInstall pelago` and copy `queries/*.scm` to `queries/pelago/` on your runtime path.
 (`indents.scm` and `outline.scm` use Zed's capture names; Neovim ignores what it does not know.)
+
+## Licence
+
+MIT OR Apache-2.0, at your option: see `LICENSE-MIT` and `LICENSE-APACHE`.
