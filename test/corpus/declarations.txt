@@ -219,9 +219,9 @@ struct point {
 enums
 ========================================
 
-/// A shape with a size.
+//~ A shape with a size.
 enum shape {
-    /// A round one.
+    //~ A round one.
     circle(radius: float)
     rect(w: float, h: float)
     empty

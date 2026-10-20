@@ -7563,24 +7563,15 @@
     "line_comment": {
       "type": "TOKEN",
       "content": {
-        "type": "CHOICE",
-        "members": [
-          {
-            "type": "PATTERN",
-            "value": "\\/\\/\\/\\/[^\\n]*"
-          },
-          {
-            "type": "PATTERN",
-            "value": "\\/\\/([^\\/\\n][^\\n]*)?"
-          }
-        ]
+        "type": "PATTERN",
+        "value": "\\/\\/\\/([^*\\n][^\\n]*)?"
       }
     },
     "doc_comment": {
       "type": "TOKEN",
       "content": {
         "type": "PATTERN",
-        "value": "\\/\\/\\/([^\\/*\\n][^\\n]*)?"
+        "value": "\\/\\/~([^*\\n][^\\n]*)?"
       }
     }
   },

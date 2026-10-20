@@ -171,7 +171,7 @@ else on the next line
 if a { 1 }
 else { 2 }
 if a { 1 }
-// comment between
+/// comment between
 else if b { 2 }
 else { 3 }
 
@@ -223,9 +223,9 @@ a = 1; b = 2
 comments between statements
 ========================================
 
-a = 1 // one
-// two
-b = 2 /* three */
+a = 1 /// one
+/// two
+b = 2 ///* three *///
 
 ---
 
