@@ -2,9 +2,9 @@ const it = 3
 // <- keyword
 //    ^ variable
 const a = xs.map(~> it * 2)
-//                  ^ variable.builtin
+//                  ^ variable.special
 const b = xs.filter(~> it > 0).map(~> f(it))
-//                     ^ variable.builtin
-//                                       ^ variable.builtin
+//                     ^ variable.special
+//                                       ^ variable.special
 for it in xs { }
 //  ^ variable

@@ -25,7 +25,7 @@ compiler's examples (see [How it is checked](#how-it-is-checked)).
 You need the Tree-sitter CLI (0.27) and a C compiler. `npm install` fetches the CLI as a dev dependency.
 
 ```
-npm install                      # tree-sitter-cli 0.27.1
+npm ci                           # tree-sitter-cli 0.27.1 (from package-lock.json)
 npx tree-sitter generate --abi 14   # after changing grammar.js or src/scanner.c; also `npm run generate`
 npx tree-sitter test             # the corpus in test/corpus
 npx tree-sitter parse file.pel   # print a syntax tree
@@ -125,7 +125,7 @@ The grammar is meant for editors, so it is a little more forgiving in some place
 ```toml
 [grammars.pelago]
 repository = "https://github.com/pelagolang/tree-sitter-pelago"
-rev = "<commit>"
+commit = "<commit>"
 ```
 
 and copy `queries/*.scm` into the language directory of the extension (`languages/pelago/`).
