@@ -2,6 +2,14 @@
   "name": "tree-sitter-pelago",
   "version": "0.1.0",
   "description": "Tree-sitter grammar for Pelago (.pel)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pelagolang/tree-sitter-pelago.git"
+  },
+  "homepage": "https://github.com/pelagolang/tree-sitter-pelago#readme",
+  "bugs": {
+    "url": "https://github.com/pelagolang/tree-sitter-pelago/issues"
+  },
   "keywords": [
     "parser",
     "tree-sitter",

@@ -12,9 +12,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: npm install
+      - run: npm ci
       - name: The generated files are up to date
         run: |
           npx tree-sitter generate --abi 14
           git diff --exit-code -- src
       - run: npx tree-sitter test
+      - name: The grammar compiles to wasm (what Zed does with it)
+        run: npx tree-sitter build --wasm -o pelago.wasm
