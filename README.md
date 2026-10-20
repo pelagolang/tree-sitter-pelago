@@ -77,7 +77,7 @@ possible (after `if`, `while`, `for ... of`, `switch`, `guard`, `unless` and `se
 literal otherwise, so `if x { y }` is a block and `point { x: 1 }` is a struct literal. Inside parentheses a
 struct literal is fine again: `if (point { x: 1 }) == p { }`.
 
-**Comments.** `//` and `///` (doc) comments are in the grammar; nested `/* */` and `///* ... *///` doc blocks are
+**Comments.** `///` (comment) and `//~` (doc) lines are in the grammar; nested `///* ... *///` blocks and `//~* ... *~//` doc blocks are
 scanned, because they cannot be written as a regular expression.
 
 ## Things to know about the trees

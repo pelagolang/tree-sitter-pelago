@@ -208,13 +208,13 @@ self.x = self
 comments
 ========================================
 
-// line comment
-/// doc comment
+/// line comment
+//~ doc comment
 //// not a doc comment
-/* block /* nested */ still a comment */
-///* doc
-block *///
-const x = 1 // trailing
+///* block ///* nested */// still a comment *///
+//~* doc
+block *~//
+const x = 1 /// trailing
 
 ---
 

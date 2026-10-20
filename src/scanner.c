@@ -4,7 +4,7 @@
 //   * newline-terminated statements (with the continuation rules of docs/design/parser.md),
 //   * `?`, `<`, `[`, `!` / `!!` that touch the token before them,
 //   * soft keywords that are keywords only in some positions (`map {`, `type x =`, `open fn`, ...),
-//   * nested block comments and `///* ... *///` doc blocks.
+//   * nested block comments `///* ... *///` and `//~* ... *~//` doc blocks.
 // The scanner keeps no state, so it needs no serialization.
 
 #include "tree_sitter/parser.h"
@@ -95,69 +95,68 @@ static bool word_is(const char *buf, unsigned len, const char *w) {
 
 // ---- Comments ----------------------------------------------------------------------------------
 
-// After `/*` was consumed: consumes up to and including the matching `*/` (they nest).
+// After `///*` was consumed: consumes up to and including the matching `*///`. Block comments
+// nest. A marker is four characters; once one is recognised the window starts again, so `///*///`
+// is an opener followed by `///` (as the compiler's lexer reads it).
 static bool finish_block_comment(TSLexer *l) {
   unsigned depth = 1;
+  char w[4] = {0, 0, 0, 0};
   while (!l->eof(l)) {
-    if (l->lookahead == '/') {
-      adv(l);
-      if (l->lookahead == '*') {
-        adv(l);
-        depth++;
-      }
-    } else if (l->lookahead == '*') {
-      adv(l);
-      if (l->lookahead == '/') {
-        adv(l);
-        if (--depth == 0) return true;
-      }
-    } else {
-      adv(l);
+    int32_t c = l->lookahead;
+    adv(l);
+    w[0] = w[1];
+    w[1] = w[2];
+    w[2] = w[3];
+    w[3] = (char)(c < 128 ? c : 1);
+    if (w[0] == '/' && w[1] == '/' && w[2] == '/' && w[3] == '*') {
+      depth++;
+      w[0] = w[1] = w[2] = w[3] = 0;
+    } else if (w[0] == '*' && w[1] == '/' && w[2] == '/' && w[3] == '/') {
+      w[0] = w[1] = w[2] = w[3] = 0;
+      if (--depth == 0) return true;
     }
   }
   return false;
 }
 
-// After `///*` was consumed: consumes up to and including `*///`.
+// After `//~*` was consumed: consumes up to and including `*~//`. Doc blocks do not nest.
 static bool finish_doc_block_comment(TSLexer *l) {
-  unsigned state = 0;  // how many characters of `*///` were seen
+  char w[4] = {0, 0, 0, 0};
   while (!l->eof(l)) {
     int32_t c = l->lookahead;
     adv(l);
-    if (c == '*') {
-      state = 1;
-    } else if (c == '/' && state >= 1) {
-      state++;
-      if (state == 4) return true;
-    } else {
-      state = 0;
-    }
+    w[0] = w[1];
+    w[1] = w[2];
+    w[2] = w[3];
+    w[3] = (char)(c < 128 ? c : 1);
+    if (w[0] == '*' && w[1] == '~' && w[2] == '/' && w[3] == '/') return true;
   }
   return false;
 }
 
 // For look-ahead only: the first `/` was consumed. Skips a comment when one follows.
-// Returns true if a comment was skipped, false if the `/` stands alone.
+// Returns true if a comment was skipped, false if the `/` stands alone. `//...` is skipped to the
+// end of the line whatever follows (the grammar rejects a bare `//`; look-ahead need not).
 static bool skip_comment_after_slash(TSLexer *l) {
-  if (l->lookahead == '*') {
-    adv(l);
-    finish_block_comment(l);
-    return true;
-  }
+  if (l->lookahead != '/') return false;
+  adv(l);
   if (l->lookahead == '/') {
     adv(l);
-    if (l->lookahead == '/') {
+    if (l->lookahead == '*') {
       adv(l);
-      if (l->lookahead == '*') {
-        adv(l);
-        finish_doc_block_comment(l);
-        return true;
-      }
+      finish_block_comment(l);
+      return true;
     }
-    while (!l->eof(l) && l->lookahead != '\n') adv(l);
-    return true;
+  } else if (l->lookahead == '~') {
+    adv(l);
+    if (l->lookahead == '*') {
+      adv(l);
+      finish_doc_block_comment(l);
+      return true;
+    }
   }
-  return false;
+  while (!l->eof(l) && l->lookahead != '\n') adv(l);
+  return true;
 }
 
 
@@ -239,12 +238,7 @@ static bool skip_group(TSLexer *l, int32_t close, bool *has_of, unsigned *budget
         break;
       case '/':
         adv(l);
-        if (l->lookahead == '*') {
-          adv(l);
-          finish_block_comment(l);
-        } else if (l->lookahead == '/') {
-          while (!l->eof(l) && l->lookahead != '\n') adv(l);
-        }
+        skip_comment_after_slash(l);
         break;
       default:
         if (is_ident_char(c)) {
@@ -643,25 +637,25 @@ bool tree_sitter_pelago_external_scanner_scan(void *payload, TSLexer *l, const b
 
   if (c == '/') {
     adv(l);
-    if (l->lookahead == '*') {
+    if (l->lookahead != '/') return false;
+    adv(l);
+    if (l->lookahead == '/') {
+      adv(l);
+      if (l->lookahead != '*') return false;
       adv(l);
       if (!finish_block_comment(l)) return false;
       l->mark_end(l);
       l->result_symbol = BLOCK_COMMENT;
       return true;
     }
-    if (l->lookahead == '/') {
+    if (l->lookahead == '~') {
       adv(l);
-      if (l->lookahead == '/') {
-        adv(l);
-        if (l->lookahead == '*') {
-          adv(l);
-          if (!finish_doc_block_comment(l)) return false;
-          l->mark_end(l);
-          l->result_symbol = DOC_BLOCK_COMMENT;
-          return true;
-        }
-      }
+      if (l->lookahead != '*') return false;
+      adv(l);
+      if (!finish_doc_block_comment(l)) return false;
+      l->mark_end(l);
+      l->result_symbol = DOC_BLOCK_COMMENT;
+      return true;
     }
     return false;
   }

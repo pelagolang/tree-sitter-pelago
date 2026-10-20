@@ -859,8 +859,8 @@ module.exports = grammar({
 
     _interpolated_name: ($) => token.immediate(/[\p{L}_][\p{L}\p{N}_]*/),
 
-    line_comment: ($) => token(choice(/\/\/\/\/[^\n]*/, /\/\/([^\/\n][^\n]*)?/)),
+    line_comment: ($) => token(/\/\/\/([^*\n][^\n]*)?/),
 
-    doc_comment: ($) => token(/\/\/\/([^\/*\n][^\n]*)?/),
+    doc_comment: ($) => token(/\/\/~([^*\n][^\n]*)?/),
   },
 });
