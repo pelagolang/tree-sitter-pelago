@@ -1,4 +1,7 @@
 ; Highlights for Pelago. Capture names follow the common set that Zed and Neovim understand.
+; Where Neovim's name has no Zed theme key of the same prefix, a second capture follows it (Zed uses the rightmost one its
+; theme defines, Neovim ignores the one it does not know): `@variable.builtin @variable.special`, `@string @character`,
+; `@constant @variant`.
 ; Later patterns win over earlier ones for the same node, so the general rules come first.
 
 ; ---- Names ------------------------------------------------------------------------------------
@@ -15,18 +18,18 @@
  (#match? @constant "^[A-Z][A-Z0-9_]*$"))
 
 ; `_` is the wildcard.
-((identifier) @variable.builtin
+((identifier) @variable.builtin @variable.special
  (#eq? @variable.builtin "_"))
 
 ; `it` is the implicit parameter of a closure written without any: `xs.map(~> it * 2)`. The grammar cannot tell it
 ; from an ordinary name, so the places that bind a name override this below.
-((identifier) @variable.builtin
+((identifier) @variable.builtin @variable.special
  (#eq? @variable.builtin "it"))
 (variable_declaration pattern: (identifier) @variable)
 (for_expression pattern: (identifier) @variable)
 
-(self) @variable.builtin
-(super) @variable.builtin
+(self) @variable.builtin @variable.special
+(super) @variable.builtin @variable.special
 (self_type) @type.builtin
 
 (label) @label
@@ -64,7 +67,7 @@
 ; ---- Parameters, fields and variants ------------------------------------------------------------
 
 (parameter name: (identifier) @variable.parameter)
-(parameter name: (self) @variable.builtin)
+(parameter name: (self) @variable.builtin @variable.special)
 (closure_parameter pattern: (identifier) @variable.parameter)
 (capture (identifier) @variable.parameter)
 (argument label: (identifier) @variable.parameter)
@@ -77,9 +80,9 @@
 (field_expression field: (identifier) @property)
 (field_expression field: (tuple_index) @number)
 
-(enum_variant name: (identifier) @constant)
-(dot_name name: (identifier) @constant)
-(variant_pattern name: (identifier) @constant)
+(enum_variant name: (identifier) @constant @variant)
+(dot_name name: (identifier) @constant @variant)
+(variant_pattern name: (identifier) @constant @variant)
 
 ; ---- Literals -------------------------------------------------------------------------------------
 
@@ -88,7 +91,7 @@
 (boolean_literal) @boolean
 (none) @constant.builtin
 
-(character_literal) @character
+(character_literal) @string @character
 (string_literal) @string
 (string_content) @string
 (escape_sequence) @string.escape
