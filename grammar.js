@@ -382,7 +382,7 @@ module.exports = grammar({
 
     function_type: ($) =>
       prec.right(
-        seq('fn', '(', list(seq(optional($.mode), $._type)), ')', optional(seq('->', field('return_type', $._type)))),
+        seq(optional('once'), 'fn', '(', list(seq(optional($.mode), $._type)), ')', optional(seq('->', field('return_type', $._type)))),
       ),
 
     option_type: ($) => prec.left(1, seq($._type, alias($._question_adjacent, '?'))),

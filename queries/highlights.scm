@@ -130,7 +130,7 @@
 (ext_modifier) @keyword.modifier
 
 [ "map" "set" "soa" ] @type.builtin
-"any" @keyword
+[ "any" "once" ] @keyword
 
 ; ---- Attributes ---------------------------------------------------------------------------------------
 

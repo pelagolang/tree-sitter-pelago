@@ -187,3 +187,33 @@ type pair<A, B> = (A, B)
     (tuple_type
       (type_identifier)
       (type_identifier))))
+
+========================================
+once fn type
+========================================
+
+fn run_once(sink f: once fn() -> int) -> int = f!!()
+var g: once fn(int) -> int
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (mode)
+        (identifier)
+        (function_type
+          (type_identifier))))
+    (type_identifier)
+    (expression_body
+      (call_expression
+        (identifier)
+        (call_mark)
+        (argument_list))))
+  (variable_declaration
+    (identifier)
+    (function_type
+      (type_identifier)
+      (type_identifier))))
