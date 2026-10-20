@@ -1,10 +1,10 @@
 const it = 3
-// <- keyword
-//    ^ variable
+/// <- keyword
+///   ^ variable
 const a = xs.map(~> it * 2)
-//                  ^ variable.special
+///                 ^ variable.special
 const b = xs.filter(~> it > 0).map(~> f(it))
-//                     ^ variable.special
-//                                       ^ variable.special
+///                    ^ variable.special
+///                                      ^ variable.special
 for it in xs { }
-//  ^ variable
+/// ^ variable

@@ -1,10 +1,10 @@
-// The last capture of a node is the one Zed uses when its theme defines it; see the header of queries/highlights.scm.
+/// The last capture of a node is the one Zed uses when its theme defines it; see the header of queries/highlights.scm.
 const x = 'a'
-//        ^ character
+///       ^ character
 fn show(self) { self }
-//      ^ variable.special
-//                ^ variable.special
+///     ^ variable.special
+///               ^ variable.special
 fn id(_) { _ }
-//         ^ variable.special
+///        ^ variable.special
 enum shape { circle, square }
-//           ^ variant
+///          ^ variant
