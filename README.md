@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/logo-dark.svg">
+    <img alt="Pelago" src="assets/logo.svg" width="240">
+  </picture>
+</p>
+
 # tree-sitter-pelago
 
 A [Tree-sitter](https://tree-sitter.github.io/) grammar for [Pelago](https://github.com/pelagolang/pelago)
