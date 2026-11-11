@@ -1,0 +1,209 @@
+========================================
+short mode marks on parameters
+========================================
+
+fn clear(xs!: [int]) { xs.clear!() }
+fn finish(xs!!: [int]) -> int = xs.len()
+struct counter {
+    n: int
+    fn bump(self!, by: int) { self.n += by }
+    fn close(self!!) -> int { self.n }
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (mode_mark)
+        (list_type
+          (type_identifier))))
+    (block
+      (call_expression
+        (field_expression
+          (identifier)
+          (identifier))
+        (call_mark)
+        (argument_list))))
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (mode_mark)
+        (list_type
+          (type_identifier))))
+    (type_identifier)
+    (expression_body
+      (call_expression
+        (field_expression
+          (identifier)
+          (identifier))
+        (argument_list))))
+  (struct_declaration
+    (type_identifier)
+    (field_declaration_list
+      (field_declaration
+        (identifier)
+        (type_identifier))
+      (function_declaration
+        (identifier)
+        (parameter_list
+          (parameter
+            (self)
+            (mode_mark))
+          (parameter
+            (identifier)
+            (type_identifier)))
+        (block
+          (assignment_expression
+            (field_expression
+              (self)
+              (identifier))
+            (identifier))))
+      (function_declaration
+        (identifier)
+        (parameter_list
+          (parameter
+            (self)
+            (mode_mark)))
+        (type_identifier)
+        (block
+          (field_expression
+            (self)
+            (identifier)))))))
+
+========================================
+short mode marks on arguments and closures
+========================================
+
+clear(scores!)
+finish(scores!!)
+f(a, n: b.items[0]!, c!!)
+each([total!, data!!] x ~> total += x)
+each(n! ~> n++)
+c.bump!(1)
+c.close!!()
+
+---
+
+(source_file
+  (call_expression
+    (identifier)
+    (argument_list
+      (argument
+        (identifier)
+        (mode_mark))))
+  (call_expression
+    (identifier)
+    (argument_list
+      (argument
+        (identifier)
+        (mode_mark))))
+  (call_expression
+    (identifier)
+    (argument_list
+      (argument
+        (identifier))
+      (argument
+        (identifier)
+        (index_expression
+          (field_expression
+            (identifier)
+            (identifier))
+          (integer_literal))
+        (mode_mark))
+      (argument
+        (identifier)
+        (mode_mark))))
+  (call_expression
+    (identifier)
+    (argument_list
+      (argument
+        (closure_expression
+          (closure_captures
+            (capture
+              (identifier)
+              (mode_mark))
+            (capture
+              (identifier)
+              (mode_mark)))
+          (closure_parameter
+            (identifier))
+          (assignment_expression
+            (identifier)
+            (identifier))))))
+  (call_expression
+    (identifier)
+    (argument_list
+      (argument
+        (closure_expression
+          (closure_parameter
+            (binding_pattern
+              (identifier)
+              (mode_mark)))
+          (update_expression
+            (identifier))))))
+  (call_expression
+    (field_expression
+      (identifier)
+      (identifier))
+    (call_mark)
+    (argument_list
+      (argument
+        (integer_literal))))
+  (call_expression
+    (field_expression
+      (identifier)
+      (identifier))
+    (call_mark)
+    (argument_list)))
+
+========================================
+short mode marks in loops, switch and patterns
+========================================
+
+for x! of scores { x++ }
+switch scores! {
+    case [first!, ...rest!]: first += 1
+    case point { x!, y }: 1
+}
+
+---
+
+(source_file
+  (for_expression
+    (binding_pattern
+      (identifier)
+      (mode_mark))
+    (identifier)
+    (block
+      (update_expression
+        (identifier))))
+  (switch_expression
+    (identifier)
+    (mode_mark)
+    (switch_body
+      (switch_arm
+        (list_pattern
+          (binding_pattern
+            (identifier)
+            (mode_mark))
+          (rest_pattern
+            (identifier)
+            (mode_mark)))
+        (assignment_expression
+          (identifier)
+          (integer_literal)))
+      (switch_arm
+        (struct_pattern
+          (identifier)
+          (field_pattern
+            (identifier)
+            (mode_mark))
+          (field_pattern
+            (identifier)))
+        (integer_literal)))))

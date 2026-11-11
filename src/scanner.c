@@ -21,6 +21,7 @@ enum TokenType {
   INDEX_LBRACKET,
   QUESTION_ADJACENT,
   CALL_BANG,
+  MODE_MARK,
   MAP_KW,
   SET_KW,
   SELECT_KW,
@@ -614,12 +615,17 @@ bool tree_sitter_pelago_external_scanner_scan(void *payload, TSLexer *l, const b
     l->result_symbol = QUESTION_ADJACENT;
     return true;
   }
-  if (c == '!' && valid[CALL_BANG]) {
+  if (c == '!' && (valid[CALL_BANG] || valid[MODE_MARK])) {
     adv(l);
     if (l->lookahead == '!') adv(l);
     l->mark_end(l);
-    if (l->lookahead != '(') return false;
-    l->result_symbol = CALL_BANG;
+    if (l->lookahead == '(') {
+      if (!valid[CALL_BANG]) return false;
+      l->result_symbol = CALL_BANG;
+      return true;
+    }
+    if (!valid[MODE_MARK]) return false;
+    l->result_symbol = MODE_MARK;
     return true;
   }
 
