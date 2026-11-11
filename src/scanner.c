@@ -563,6 +563,7 @@ static bool scan_word(TSLexer *l, const bool *valid) {
 // a `(`, `{` or `.` follows, as in `max<int>(3, 7)`. The `<` was consumed.
 static bool generic_args_follow(TSLexer *l) {
   unsigned depth = 1;
+  bool after_semi = false;  // `braid<A, B; K * 2>`: arithmetic is allowed in a braid length only
   for (;;) {
     int32_t c = l->lookahead;
     if (l->eof(l)) return false;
@@ -575,6 +576,10 @@ static bool generic_args_follow(TSLexer *l) {
         skip_blanks(l);
         return l->lookahead == '(' || l->lookahead == '{' || l->lookahead == '.';
       }
+    } else if (c == ';') {
+      after_semi = true;
+    } else if (after_semi && (c == '*' || c == '+' || c == '/' || c == '%')) {
+      // fine
     } else if (!(is_ident_char(c) || c == ' ' || c == '\t' || c == ',' || c == '.' || c == '[' ||
                  c == ']' || c == '(' || c == ')' || c == ';' || c == '?' || c == '!' || c == '-')) {
       return false;

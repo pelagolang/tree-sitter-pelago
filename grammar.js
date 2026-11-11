@@ -367,7 +367,28 @@ module.exports = grammar({
     generic_type: ($) =>
       seq(field('type', choice($._type_name, $.scoped_type_identifier)), field('arguments', $.type_arguments)),
 
-    type_arguments: ($) => seq(alias($._generic_lt, '<'), commaSep1($._generic_argument), '>'),
+    // `braid<A, B; N>`: the same type as `(A, B; N)`. The length is arithmetic on integers, names and parentheses, never a comparison, so that `>` ends the type.
+    type_arguments: ($) =>
+      seq(
+        alias($._generic_lt, '<'),
+        commaSep1($._generic_argument),
+        optional(seq(';', field('length', $._braid_length))),
+        '>',
+      ),
+
+    _braid_length: ($) => choice($.integer_literal, $.identifier, $.parenthesized_expression, alias($._braid_arith, $.binary_expression)),
+
+    _braid_arith: ($) =>
+      choice(
+        prec.left(
+          PREC.additive,
+          seq(field('left', $._braid_length), field('operator', choice('+', '-')), field('right', $._braid_length)),
+        ),
+        prec.left(
+          PREC.multiplicative,
+          seq(field('left', $._braid_length), field('operator', choice('*', '/', '%')), field('right', $._braid_length)),
+        ),
+      ),
 
     _expr_type_arguments: ($) =>
       seq(alias($._generic_lt_expr, '<'), commaSep1($._generic_argument), '>'),
@@ -670,7 +691,12 @@ module.exports = grammar({
 
     parenthesized_expression: ($) => seq('(', $._expression, ')'),
 
-    tuple_expression: ($) => choice(seq('(', ')'), seq('(', $._expression, ',', list($._expression), ')')),
+    // `(a, b; N)` is the repeat form of a braid: the cycle `a, b` written N slots long.
+    tuple_expression: ($) =>
+      choice(
+        seq('(', ')'),
+        seq('(', $._expression, ',', list($._expression), optional(seq(';', field('count', $._expression))), ')'),
+      ),
 
     _list_item: ($) => choice($._expression, $.spread_element),
 

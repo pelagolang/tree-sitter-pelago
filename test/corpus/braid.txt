@@ -1,0 +1,136 @@
+========================================
+braid types
+========================================
+
+const a: braid<int, string; 4> = (1, "a", 2, "b")
+const b: braid<int, string; 2 * 3> = x
+const c: braid<int, string, bool; N + 1> = x
+const d: (int, string; 2 * 3) = x
+const e: [(int, string); 2] = x
+fn f(x: braid<uint8, string; (n)>) { }
+
+---
+
+(source_file
+  (variable_declaration
+    (identifier)
+    (generic_type
+      (type_identifier)
+      (type_arguments
+        (type_identifier)
+        (type_identifier)
+        (integer_literal)))
+    (tuple_expression
+      (integer_literal)
+      (string_literal
+        (string_content))
+      (integer_literal)
+      (string_literal
+        (string_content))))
+  (variable_declaration
+    (identifier)
+    (generic_type
+      (type_identifier)
+      (type_arguments
+        (type_identifier)
+        (type_identifier)
+        (binary_expression
+          (integer_literal)
+          (integer_literal))))
+    (identifier))
+  (variable_declaration
+    (identifier)
+    (generic_type
+      (type_identifier)
+      (type_arguments
+        (type_identifier)
+        (type_identifier)
+        (type_identifier)
+        (binary_expression
+          (identifier)
+          (integer_literal))))
+    (identifier))
+  (variable_declaration
+    (identifier)
+    (tuple_type
+      (type_identifier)
+      (type_identifier)
+      (binary_expression
+        (integer_literal)
+        (integer_literal)))
+    (identifier))
+  (variable_declaration
+    (identifier)
+    (array_type
+      (tuple_type
+        (type_identifier)
+        (type_identifier))
+      (integer_literal))
+    (identifier))
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (generic_type
+          (type_identifier)
+          (type_arguments
+            (type_identifier)
+            (type_identifier)
+            (parenthesized_expression
+              (identifier))))))
+    (block)))
+
+========================================
+braid repeat literal and size in a generic argument
+========================================
+
+const z: (int, string; 6) = (0, ""; 6)
+const buf = rtAlloc(rtSizeOf<(A, B; K * 2)>() + 8)
+const lt = a < b
+const lt2 = a < b * c
+
+---
+
+(source_file
+  (variable_declaration
+    (identifier)
+    (tuple_type
+      (type_identifier)
+      (type_identifier)
+      (integer_literal))
+    (tuple_expression
+      (integer_literal)
+      (string_literal)
+      (integer_literal)))
+  (variable_declaration
+    (identifier)
+    (call_expression
+      (identifier)
+      (argument_list
+        (argument
+          (binary_expression
+            (call_expression
+              (type_application
+                (identifier)
+                (type_arguments
+                  (tuple_type
+                    (type_identifier)
+                    (type_identifier)
+                    (binary_expression
+                      (identifier)
+                      (integer_literal)))))
+              (argument_list))
+            (integer_literal))))))
+  (variable_declaration
+    (identifier)
+    (binary_expression
+      (identifier)
+      (identifier)))
+  (variable_declaration
+    (identifier)
+    (binary_expression
+      (identifier)
+      (binary_expression
+        (identifier)
+        (identifier)))))
