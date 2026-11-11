@@ -7657,7 +7657,18 @@
   {
     "type": "tuple_expression",
     "named": true,
-    "fields": {},
+    "fields": {
+      "count": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "_expression",
+            "named": true
+          }
+        ]
+      }
+    },
     "children": {
       "multiple": true,
       "required": false,
@@ -7791,7 +7802,30 @@
   {
     "type": "type_arguments",
     "named": true,
-    "fields": {},
+    "fields": {
+      "length": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "binary_expression",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "integer_literal",
+            "named": true
+          },
+          {
+            "type": "parenthesized_expression",
+            "named": true
+          }
+        ]
+      }
+    },
     "children": {
       "multiple": true,
       "required": true,
