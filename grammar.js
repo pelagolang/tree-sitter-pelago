@@ -63,6 +63,7 @@ module.exports = grammar({
     $._index_lbracket,
     $._question_adjacent,
     $._call_bang,
+    $._mode_mark,
     $._map_kw,
     $._set_kw,
     $._select_kw,
@@ -101,6 +102,8 @@ module.exports = grammar({
     [$.if_expression],
     [$.if_expression, $.meta_if_expression],
     [$._operand, $.select_arm],
+    [$._operand, $.binding_pattern],
+    [$._pattern, $.binding_pattern],
     [$._type, $.scoped_type_identifier],
     [$._pattern, $._pattern_literal],
     [$._pattern, $.as_pattern],
@@ -211,11 +214,15 @@ module.exports = grammar({
 
     mode: ($) => choice('let', 'inout', 'sink'),
 
+    // The short spellings, written right after the name: `x!` is `inout x`, `x!!` is `sink x`.
+    mode_mark: ($) => $._mode_mark,
+
     parameter: ($) =>
       seq(
         optional($.mode),
         optional('...'),
         field('name', choice($.self, $.identifier)),
+        optional($.mode_mark),
         optional(seq(':', field('type', $._type))),
         optional(seq('=', field('default', $._expression))),
       ),
@@ -409,7 +416,7 @@ module.exports = grammar({
         $.scoped_identifier,
       ),
 
-    binding_pattern: ($) => seq($.mode, $.identifier),
+    binding_pattern: ($) => choice(seq($.mode, $.identifier), prec.dynamic(1, seq($.identifier, $.mode_mark))),
 
     _pattern_literal: ($) => choice($._literal, $.negated_literal),
 
@@ -423,7 +430,7 @@ module.exports = grammar({
 
     list_pattern: ($) => seq('[', list(choice($.rest_pattern, $._pattern)), ']'),
 
-    rest_pattern: ($) => seq('...', optional($.mode), optional($.identifier)),
+    rest_pattern: ($) => seq('...', optional($.mode), optional(seq($.identifier, optional($.mode_mark)))),
 
     scoped_identifier: ($) =>
       seq(field('path', choice($.identifier, $.scoped_identifier)), '.', field('name', $.identifier)),
@@ -446,7 +453,8 @@ module.exports = grammar({
         '}',
       ),
 
-    field_pattern: ($) => seq(optional($.mode), field('name', $.identifier), optional(seq(':', $._pattern))),
+    field_pattern: ($) =>
+      seq(optional($.mode), field('name', $.identifier), optional($.mode_mark), optional(seq(':', $._pattern))),
 
     as_pattern: ($) => seq(field('name', $.identifier), 'is', $._pattern),
 
@@ -618,6 +626,7 @@ module.exports = grammar({
         optional(seq(field('label', $.identifier), ':')),
         optional('...'),
         field('value', $._expression),
+        optional($.mode_mark),
       ),
 
     field_expression: ($) =>
@@ -721,14 +730,18 @@ module.exports = grammar({
 
     closure_captures: ($) => seq(alias($._closure_lbracket, '['), list($.capture), ']'),
 
-    capture: ($) => seq(optional($.mode), $.identifier),
+    capture: ($) => seq(optional($.mode), $.identifier, optional($.mode_mark)),
 
     closure_parameters: ($) => seq(alias($._closure_lparen, '('), list($.closure_parameter), ')'),
 
     closure_parameter: ($) => seq(field('pattern', $._pattern), optional(seq(':', field('type', $._type)))),
 
     // `x ~> e`. In a builder clause such as `[x of return y ~> z]` the expression reading is preferred.
-    _lone_parameter: ($) => prec(-1, field('pattern', $.identifier)),
+    _lone_parameter: ($) =>
+      choice(
+        prec(-1, field('pattern', $.identifier)),
+        field('pattern', $.binding_pattern),
+      ),
 
     // ---- Control flow ------------------------------------------------------------------------
 
@@ -744,7 +757,7 @@ module.exports = grammar({
       seq('meta', 'if', field('condition', $._expression), field('consequence', $.block), optional($.else_clause)),
 
     switch_expression: ($) =>
-      seq('switch', optional($.mode), field('value', $._expression), field('body', $.switch_body)),
+      seq('switch', optional($.mode), field('value', $._expression), optional($.mode_mark), field('body', $.switch_body)),
 
     switch_body: ($) => seq(alias($._block_lbrace, '{'), repeat(choice($.switch_arm, ';')), '}'),
 

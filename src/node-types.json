@@ -394,11 +394,15 @@
       }
     },
     "children": {
-      "multiple": false,
+      "multiple": true,
       "required": false,
       "types": [
         {
           "type": "mode",
+          "named": true
+        },
+        {
+          "type": "mode_mark",
           "named": true
         }
       ]
@@ -1633,6 +1637,10 @@
         {
           "type": "mode",
           "named": true
+        },
+        {
+          "type": "mode_mark",
+          "named": true
         }
       ]
     }
@@ -2461,6 +2469,10 @@
         },
         {
           "type": "mode",
+          "named": true
+        },
+        {
+          "type": "mode_mark",
           "named": true
         }
       ]
@@ -3881,6 +3893,10 @@
         },
         {
           "type": "mode",
+          "named": true
+        },
+        {
+          "type": "mode_mark",
           "named": true
         }
       ]
@@ -5429,6 +5445,11 @@
     "fields": {}
   },
   {
+    "type": "mode_mark",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "modifier",
     "named": true,
     "fields": {}
@@ -5608,11 +5629,15 @@
       }
     },
     "children": {
-      "multiple": false,
+      "multiple": true,
       "required": false,
       "types": [
         {
           "type": "mode",
+          "named": true
+        },
+        {
+          "type": "mode_mark",
           "named": true
         }
       ]
@@ -6436,6 +6461,10 @@
         {
           "type": "mode",
           "named": true
+        },
+        {
+          "type": "mode_mark",
+          "named": true
         }
       ]
     }
@@ -7110,11 +7139,15 @@
       }
     },
     "children": {
-      "multiple": false,
+      "multiple": true,
       "required": false,
       "types": [
         {
           "type": "mode",
+          "named": true
+        },
+        {
+          "type": "mode_mark",
           "named": true
         }
       ]

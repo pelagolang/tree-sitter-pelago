@@ -126,6 +126,7 @@
 
 [ "inout" "sink" "let" "copy" ] @keyword.modifier
 (mode) @keyword.modifier
+(mode_mark) @keyword.modifier
 (modifier) @keyword.modifier
 (ext_modifier) @keyword.modifier
 
