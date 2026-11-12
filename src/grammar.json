@@ -748,6 +748,10 @@
       "type": "SYMBOL",
       "name": "_mode_mark"
     },
+    "type_mode_mark": {
+      "type": "SYMBOL",
+      "name": "_type_mode_mark"
+    },
     "parameter": {
       "type": "SEQ",
       "members": [
@@ -2960,6 +2964,18 @@
                           {
                             "type": "SYMBOL",
                             "name": "_type"
+                          },
+                          {
+                            "type": "CHOICE",
+                            "members": [
+                              {
+                                "type": "SYMBOL",
+                                "name": "type_mode_mark"
+                              },
+                              {
+                                "type": "BLANK"
+                              }
+                            ]
                           }
                         ]
                       },
@@ -2990,6 +3006,18 @@
                                 {
                                   "type": "SYMBOL",
                                   "name": "_type"
+                                },
+                                {
+                                  "type": "CHOICE",
+                                  "members": [
+                                    {
+                                      "type": "SYMBOL",
+                                      "name": "type_mode_mark"
+                                    },
+                                    {
+                                      "type": "BLANK"
+                                    }
+                                  ]
                                 }
                               ]
                             }
@@ -7985,6 +8013,10 @@
     {
       "type": "SYMBOL",
       "name": "_mode_mark"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_type_mode_mark"
     },
     {
       "type": "SYMBOL",

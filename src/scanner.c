@@ -22,6 +22,7 @@ enum TokenType {
   QUESTION_ADJACENT,
   CALL_BANG,
   MODE_MARK,
+  TYPE_MODE_MARK,
   MAP_KW,
   SET_KW,
   SELECT_KW,
@@ -618,6 +619,15 @@ bool tree_sitter_pelago_external_scanner_scan(void *payload, TSLexer *l, const b
     if (l->lookahead == '?' || l->lookahead == '.') return false;
     l->mark_end(l);
     l->result_symbol = QUESTION_ADJACENT;
+    return true;
+  }
+  if (c == '!' && valid[TYPE_MODE_MARK]) {
+    adv(l);
+    if (l->lookahead == '!') adv(l);
+    l->mark_end(l);
+    while (is_blank(l->lookahead)) adv(l);
+    if (l->lookahead != ',' && l->lookahead != ')') return false;
+    l->result_symbol = TYPE_MODE_MARK;
     return true;
   }
   if (c == '!' && (valid[CALL_BANG] || valid[MODE_MARK])) {

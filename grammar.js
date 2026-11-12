@@ -64,6 +64,7 @@ module.exports = grammar({
     $._question_adjacent,
     $._call_bang,
     $._mode_mark,
+    $._type_mode_mark,
     $._map_kw,
     $._set_kw,
     $._select_kw,
@@ -216,6 +217,8 @@ module.exports = grammar({
 
     // The short spellings, written right after the name: `x!` is `inout x`, `x!!` is `sink x`.
     mode_mark: ($) => $._mode_mark,
+    // `T!` / `T!!` after a type in a function type; only before `,` or `)`, so `T!E` stays a result type.
+    type_mode_mark: ($) => $._type_mode_mark,
 
     parameter: ($) =>
       seq(
@@ -410,7 +413,7 @@ module.exports = grammar({
 
     function_type: ($) =>
       prec.right(
-        seq(optional('once'), 'fn', '(', list(seq(optional($.mode), $._type)), ')', optional(seq('->', field('return_type', $._type)))),
+        seq(optional('once'), 'fn', '(', list(seq(optional($.mode), $._type, optional($.type_mode_mark))), ')', optional(seq('->', field('return_type', $._type)))),
       ),
 
     option_type: ($) => prec.left(1, seq($._type, alias($._question_adjacent, '?'))),
