@@ -207,3 +207,27 @@ switch scores! {
           (field_pattern
             (identifier)))
         (integer_literal)))))
+
+================================================================================
+mode marks in function types
+================================================================================
+
+fn f(g: fn(int!, string!!) -> int!string) { }
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (function_type
+          (type_identifier)
+          (type_mode_mark)
+          (type_identifier)
+          (type_mode_mark)
+          (result_type
+            (type_identifier)
+            (type_identifier)))))
+    (block)))

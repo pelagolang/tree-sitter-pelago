@@ -4070,6 +4070,10 @@
         {
           "type": "mode",
           "named": true
+        },
+        {
+          "type": "type_mode_mark",
+          "named": true
         }
       ]
     }
@@ -7860,6 +7864,11 @@
         }
       ]
     }
+  },
+  {
+    "type": "type_mode_mark",
+    "named": true,
+    "fields": {}
   },
   {
     "type": "unary_expression",
