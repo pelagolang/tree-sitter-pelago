@@ -11,7 +11,7 @@
 (type_identifier) @type
 
 ((type_identifier) @type.builtin
- (#match? @type.builtin "^(int|int8|int16|int32|int64|uint|uint8|uint16|uint32|uint64|byte|float|float32|float64|bool|char|string|str|map|set|range|option|result|box|soa|rc|ptr|void|never|error|list|iter|task|chan|sender|receiver|shared|lock)$"))
+ (#match? @type.builtin "^(int|int8|int16|int32|int64|uint|uint8|uint16|uint32|uint64|int128|uint128|int256|uint256|byte|float|float16|float32|float64|float128|float256|bool|char|string|str|map|set|range|option|result|box|soa|rc|ptr|void|never|error|list|iter|task|chan|sender|receiver|shared|lock)$"))
 
 ; A name written in capitals is a constant.
 ((identifier) @constant
