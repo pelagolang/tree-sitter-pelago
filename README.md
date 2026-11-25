@@ -48,7 +48,7 @@ After editing the grammar, regenerate and commit the files in `src/` together wi
 ## What the external scanner does
 
 Parts of Pelago depend on spacing or on what comes next, which an LR grammar cannot see. They live in
-`src/scanner.c`, which keeps no state. The rules are the ones in `docs/design/parser.md` of the Pelago repository.
+`src/scanner.c`, which keeps no state. The rules are the ones the Pelago parser follows (`compiler/src/parser/` in the Pelago repository).
 
 **Newlines.** The scanner emits `_newline` only where the grammar can end a statement (a list of statements
 in a block, a `case` arm, the file, a type body). A newline does *not* end the statement when the next
