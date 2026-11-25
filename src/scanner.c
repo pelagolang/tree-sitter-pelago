@@ -1,7 +1,7 @@
 // External scanner for the Pelago grammar.
 //
 // It handles the parts of the language that depend on spacing and on what comes next:
-//   * newline-terminated statements (with the continuation rules of docs/design/parser.md),
+//   * newline-terminated statements (with the continuation rules of the Pelago parser),
 //   * `?`, `<`, `[`, `!` / `!!` that touch the token before them,
 //   * soft keywords that are keywords only in some positions (`map {`, `type x =`, `open fn`, ...),
 //   * nested block comments `///* ... *///` and `//~* ... *~//` doc blocks.
