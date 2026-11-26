@@ -353,6 +353,7 @@ module.exports = grammar({
         $.self_type,
         $.list_type,
         $.array_type,
+        $.window_type,
         $.tuple_type,
         $.function_type,
         $.option_type,
@@ -406,6 +407,9 @@ module.exports = grammar({
     self_type: ($) => 'Self',
 
     list_type: ($) => seq('[', $._type, ']'),
+
+    // `[T..]`, the borrowed window type (long spelling `slice<T>`).
+    window_type: ($) => seq('[', field('element', $._type), '..', ']'),
 
     array_type: ($) => seq('[', field('element', $._type), ';', field('length', $._expression), ']'),
 

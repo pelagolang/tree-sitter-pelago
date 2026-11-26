@@ -217,3 +217,22 @@ var g: once fn(int) -> int
     (function_type
       (type_identifier)
       (type_identifier))))
+
+================================================================================
+Window type
+================================================================================
+
+fn bump(xs!: [int..]) {}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (mode_mark)
+        (window_type
+          (type_identifier))))
+    (block)))
