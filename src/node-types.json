@@ -350,6 +350,10 @@
       {
         "type": "type_identifier",
         "named": true
+      },
+      {
+        "type": "window_type",
+        "named": true
       }
     ]
   },
@@ -8585,6 +8589,22 @@
         "types": [
           {
             "type": "_expression",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "window_type",
+    "named": true,
+    "fields": {
+      "element": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "_type",
             "named": true
           }
         ]
